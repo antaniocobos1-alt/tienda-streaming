@@ -10,16 +10,16 @@
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
     <!-- Navegación -->
-    <nav class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
+    <nav class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
                 <i class="fa-solid fa-play-circle"></i> Streaming Store
             </h1>
-            <div class="flex items-center gap-4">
-                <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-sm">
+            <div class="flex items-center gap-3">
+                <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs sm:text-sm">
                     Saldo: <span id="user-balance" class="text-emerald-400 font-bold">$0.00</span> MXN
                 </div>
-                <button onclick="switchTab('admin')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded transition">
+                <button onclick="requestAdminAccess()" class="text-xs bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-2 rounded-lg transition">
                     <i class="fa-solid fa-lock"></i> Admin
                 </button>
             </div>
@@ -31,16 +31,16 @@
 
         <!-- Sección Tienda (Clientes) -->
         <section id="tab-shop" class="space-y-6">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center flex-wrap gap-3">
                 <h2 class="text-2xl font-bold">Catálogo de Cuentas</h2>
-                <button onclick="openTopUpModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                <button onclick="openTopUpModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg">
                     <i class="fa-solid fa-wallet"></i> Recargar Saldo
                 </button>
             </div>
 
             <!-- Grilla de Productos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid">
-                <!-- Se cargan dinámicamente con JS -->
+                <!-- Se cargan dinámicamente -->
             </div>
 
             <!-- Historial de Compras -->
@@ -59,7 +59,7 @@
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-slate-700">
-                            <!-- Se carga con JS -->
+                            <!-- Se carga dinámicamente -->
                         </tbody>
                     </table>
                 </div>
@@ -68,10 +68,10 @@
 
         <!-- Panel de Administración (Sólo Admin) -->
         <section id="tab-admin" class="hidden space-y-6">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-amber-500/30">
                 <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Panel Administrador</h2>
-                <button onclick="switchTab('shop')" class="text-sm bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg">
-                    Volver a Tienda
+                <button onclick="switchTab('shop')" class="text-sm bg-indigo-600 hover:bg-indigo-500 font-bold px-3 py-2 rounded-lg">
+                    <i class="fa-solid fa-store"></i> Volver a Tienda
                 </button>
             </div>
 
@@ -82,9 +82,9 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs text-slate-400">Monto a abonar (MXN)</label>
-                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1">
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button onclick="addCredit()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-medium py-2 rounded-lg text-sm transition">
+                        <button onclick="addCredit()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-lg text-sm transition">
                             Añadir Crédito al Cliente
                         </button>
                     </div>
@@ -96,5 +96,218 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs text-slate-400">Seleccionar Producto</label>
-                            <select id="stock-product-id" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1">
+                            <select id="stock-product-id" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
                                 <!-- Opciones cargadas por JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Credenciales (correo:contraseña o enlace)</label>
+                            <input type="text" id="stock-credentials" placeholder="ejemplo@mail.com:clave123" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button onclick="addStock()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-bold py-2.5 rounded-lg text-sm transition">
+                            Guardar en Stock
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal para Recargar Saldo -->
+    <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100]">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+            <h3 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
+                <i class="fa-solid fa-building-columns"></i> Cómo recargar saldo
+            </h3>
+            <p class="text-sm text-slate-300">
+                Realiza una transferencia o depósito con los siguientes datos y envía tu comprobante de pago:
+            </p>
+            <div class="bg-slate-900 p-4 rounded-lg text-sm space-y-2 font-mono text-indigo-300 border border-slate-700">
+                <p><strong>Banco:</strong> Banco Ejemplo</p>
+                <p><strong>CLABE:</strong> 1234 5678 9012 3456 78</p>
+                <p><strong>Titular:</strong> Tu Nombre</p>
+            </div>
+            <p class="text-xs text-slate-400">
+                Una vez verificado tu depósito, el administrador abonará tu saldo de inmediato.
+            </p>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeTopUpModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-lg text-sm">
+                    Entendido / Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Lógica JavaScript -->
+    <script>
+        const ADMIN_PIN = "1234";
+
+        let state = {
+            balance: 0.00,
+            products: [
+                { id: 'netflix', name: 'Netflix 1 Pantalla', price: 65.00, icon: 'fa-tv', color: 'text-red-500' },
+                { id: 'disney', name: 'Disney+ Premium', price: 50.00, icon: 'fa-wand-magic-sparkles', color: 'text-blue-400' },
+                { id: 'vix', name: 'ViX Premium', price: 40.00, icon: 'fa-film', color: 'text-orange-500' },
+                { id: 'spotify', name: 'Spotify 1 Mes', price: 35.00, icon: 'fa-music', color: 'text-emerald-400' }
+            ],
+            inventory: [
+                { id: 1, productId: 'netflix', credentials: 'demo_user1@netflix.com : Clave2026', status: 'available' },
+                { id: 2, productId: 'disney', credentials: 'demo_user2@disney.com : Clave2026', status: 'available' }
+            ],
+            purchases: []
+        };
+
+        function renderProducts() {
+            const container = document.getElementById('products-grid');
+            const selectAdmin = document.getElementById('stock-product-id');
+            container.innerHTML = '';
+            selectAdmin.innerHTML = '';
+
+            state.products.forEach(prod => {
+                const stockCount = state.inventory.filter(i => i.productId === prod.id && i.status === 'available').length;
+
+                selectAdmin.innerHTML += `<option value="${prod.id}">${prod.name}</option>`;
+
+                container.innerHTML += `
+                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-between space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid ${prod.icon} ${prod.color} text-2xl"></i>
+                                <div>
+                                    <h3 class="font-bold">${prod.name}</h3>
+                                    <span class="text-xs ${stockCount > 0 ? 'text-emerald-400' : 'text-rose-400'} font-medium">
+                                        ${stockCount > 0 ? `${stockCount} disponibles` : 'Agotado'}
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="text-lg font-bold">$${prod.price.toFixed(2)}</span>
+                        </div>
+                        <button onclick="buyProduct('${prod.id}')" 
+                            ${stockCount === 0 ? 'disabled' : ''} 
+                            class="w-full py-2.5 rounded-lg font-medium text-sm transition ${
+                                stockCount > 0 
+                                ? 'bg-indigo-600 hover:bg-indigo-500 text-white' 
+                                : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                            }">
+                            ${stockCount > 0 ? 'Comprar Ahora' : 'Sin Stock'}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('user-balance').innerText = `$${state.balance.toFixed(2)}`;
+            
+            const list = document.getElementById('purchases-list');
+            list.innerHTML = '';
+
+            if (state.purchases.length === 0) {
+                list.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Aún no has realizado ninguna compra.</td></tr>`;
+                return;
+            }
+
+            state.purchases.forEach(item => {
+                list.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-medium">${item.productName}</td>
+                        <td class="p-3 font-mono text-xs text-indigo-300 bg-slate-900/50 rounded">${item.credentials}</td>
+                        <td class="p-3">$${item.price.toFixed(2)}</td>
+                        <td class="p-3 text-slate-400 text-xs">${item.date}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function buyProduct(productId) {
+            const product = state.products.find(p => p.id === productId);
+
+            if (state.balance < product.price) {
+                alert('Saldo insuficiente. Por favor realiza una recarga.');
+                openTopUpModal();
+                return;
+            }
+
+            const itemIndex = state.inventory.findIndex(i => i.productId === productId && i.status === 'available');
+            if (itemIndex === -1) {
+                alert('Producto agotado por el momento.');
+                return;
+            }
+
+            state.balance -= product.price;
+            const item = state.inventory[itemIndex];
+            item.status = 'sold';
+
+            state.purchases.unshift({
+                productName: product.name,
+                credentials: item.credentials,
+                price: product.price,
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            updateUI();
+            renderProducts();
+            alert(`¡Compra Exitosa!\nTu cuenta: ${item.credentials}`);
+        }
+
+        function addCredit() {
+            const amount = parseFloat(document.getElementById('add-credit-amount').value);
+            if (amount > 0) {
+                state.balance += amount;
+                updateUI();
+                alert(`Se han añadido $${amount.toFixed(2)} MXN al saldo del cliente.`);
+            }
+        }
+
+        function addStock() {
+            const prodId = document.getElementById('stock-product-id').value;
+            const creds = document.getElementById('stock-credentials').value.trim();
+
+            if (!creds) {
+                alert('Escribe las credenciales de la cuenta.');
+                return;
+            }
+
+            state.inventory.push({
+                id: Date.now(),
+                productId: prodId,
+                credentials: creds,
+                status: 'available'
+            });
+
+            document.getElementById('stock-credentials').value = '';
+            renderProducts();
+            alert('Cuenta guardada con éxito en el stock.');
+        }
+
+        function requestAdminAccess() {
+            const pass = prompt("Ingresa la clave de Administrador (clave por defecto: 1234):");
+            if (pass === ADMIN_PIN) {
+                switchTab('admin');
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function openTopUpModal() { 
+            const modal = document.getElementById('topup-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeTopUpModal() { 
+            const modal = document.getElementById('topup-modal');
+            modal.classList.add('hidden');
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
+            document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        renderProducts();
+        updateUI();
+    </script>
+</body>
+</html>
