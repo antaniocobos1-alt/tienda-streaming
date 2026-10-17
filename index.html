@@ -7,19 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-purple-500 selection:text-white">
 
     <!-- Navegación -->
-    <nav class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-40">
+    <nav class="bg-slate-900/90 backdrop-blur-md border-b border-purple-900/40 p-4 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
-                <i class="fa-solid fa-play-circle"></i> Streaming Store
+            <h1 class="text-xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
+                <i class="fa-solid fa-play-circle text-purple-400"></i> Streaming Store
             </h1>
             <div class="flex items-center gap-3">
-                <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-xs sm:text-sm">
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-purple-500/30 text-xs sm:text-sm">
                     Saldo: <span id="user-balance" class="text-emerald-400 font-bold">$0.00</span> MXN
                 </div>
-                <button onclick="requestAdminAccess()" class="text-xs bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-2 rounded-lg transition">
+                <button onclick="requestAdminAccess()" class="text-xs bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-3 py-2 rounded-xl transition shadow-lg shadow-amber-500/20">
                     <i class="fa-solid fa-lock"></i> Admin
                 </button>
             </div>
@@ -32,33 +32,33 @@
         <!-- Sección Tienda (Clientes) -->
         <section id="tab-shop" class="space-y-6">
             <div class="flex justify-between items-center flex-wrap gap-3">
-                <h2 class="text-2xl font-bold">Catálogo de Cuentas</h2>
-                <button onclick="openTopUpModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg">
+                <h2 class="text-2xl font-bold text-white tracking-wide">Catálogo de Cuentas</h2>
+                <button onclick="openTopUpModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
                     <i class="fa-solid fa-wallet"></i> Recargar Saldo
                 </button>
             </div>
 
-            <!-- Grilla de Productos -->
+            <!-- Grilla de Productos con Imágenes -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid">
                 <!-- Se cargan dinámicamente -->
             </div>
 
             <!-- Historial de Compras -->
-            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mt-8 space-y-4">
-                <h3 class="text-lg font-bold flex items-center gap-2">
+            <div class="bg-slate-900/80 rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-purple-300">
                     <i class="fa-solid fa-clock-rotate-left"></i> Mis Cuentas Compradas
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-900 text-slate-400">
+                        <thead class="bg-slate-950 text-slate-400">
                             <tr>
                                 <th class="p-3">Servicio</th>
-                                <th class="p-3">Credenciales / Datos de Acceso</th>
+                                <th class="p-3">Credenciales / Panel de Códigos</th>
                                 <th class="p-3">Precio</th>
-                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Fecha y Vencimiento</th>
                             </tr>
                         </thead>
-                        <tbody id="purchases-list" class="divide-y divide-slate-700">
+                        <tbody id="purchases-list" class="divide-y divide-slate-800">
                             <!-- Se carga dinámicamente -->
                         </tbody>
                     </table>
@@ -66,45 +66,77 @@
             </div>
         </section>
 
-        <!-- Panel de Administración (Sólo Admin) -->
+        <!-- Panel de Administración -->
         <section id="tab-admin" class="hidden space-y-6">
-            <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-amber-500/30">
-                <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Panel Administrador</h2>
-                <button onclick="switchTab('shop')" class="text-sm bg-indigo-600 hover:bg-indigo-500 font-bold px-3 py-2 rounded-lg">
+            <div class="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-amber-500/30 shadow-xl">
+                <h2 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Panel Administrador
+                </h2>
+                <button onclick="switchTab('shop')" class="text-sm bg-purple-600 hover:bg-purple-500 font-bold px-4 py-2 rounded-xl transition">
                     <i class="fa-solid fa-store"></i> Volver a Tienda
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Agregar Crédito a Cliente -->
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-                    <h3 class="font-bold text-lg text-emerald-400"><i class="fa-solid fa-plus-circle"></i> Agregar Crédito a Cliente</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Monto a abonar (MXN)</label>
-                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <button onclick="addCredit()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-lg text-sm transition">
-                            Añadir Crédito al Cliente
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Cargar Stock de Cuentas -->
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-                    <h3 class="font-bold text-lg text-indigo-400"><i class="fa-solid fa-box-archive"></i> Cargar Inventario de Cuentas</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Modificar Precios -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-tags"></i> Modificar Precios
+                    </h3>
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs text-slate-400">Seleccionar Producto</label>
-                            <select id="stock-product-id" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
+                            <select id="price-product-id" onchange="loadCurrentPrice()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
                                 <!-- Opciones cargadas por JS -->
                             </select>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Credenciales (correo:contraseña o enlace)</label>
-                            <input type="text" id="stock-credentials" placeholder="ejemplo@mail.com:clave123" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
+                            <label class="text-xs text-slate-400">Nuevo Precio (MXN)</label>
+                            <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
                         </div>
-                        <button onclick="addStock()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-bold py-2.5 rounded-lg text-sm transition">
+                        <button onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">
+                            Actualizar Precio
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agregar Crédito a Cliente -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> Agregar Crédito
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Monto a abonar (MXN)</label>
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                        </div>
+                        <button onclick="addCredit()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">
+                            Añadir Crédito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cargar Stock de Cuentas y Enlace de Códigos -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-purple-400 flex items-center gap-2">
+                        <i class="fa-solid fa-box-archive"></i> Cargar Inventario
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Seleccionar Producto</label>
+                            <select id="stock-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                                <!-- Opciones cargadas por JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Credenciales (correo:contraseña)</label>
+                            <input type="text" id="stock-credentials" placeholder="correo@mail.com : clave123" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Enlace Panel de Códigos / Hogar (Opcional)</label>
+                            <input type="text" id="stock-code-link" placeholder="https://paneldecodigos.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                        </div>
+                        <button onclick="addStock()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition">
                             Guardar en Stock
                         </button>
                     </div>
@@ -114,16 +146,16 @@
 
     </main>
 
-    <!-- Modal para Recargar Saldo -->
-    <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100]">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
+    <!-- Modal Recargar Saldo -->
+    <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
+        <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+            <h3 class="text-xl font-bold text-purple-400 flex items-center gap-2">
                 <i class="fa-solid fa-building-columns"></i> Cómo recargar saldo
             </h3>
             <p class="text-sm text-slate-300">
                 Realiza una transferencia o depósito con los siguientes datos y envía tu comprobante de pago:
             </p>
-            <div class="bg-slate-900 p-4 rounded-lg text-sm space-y-2 font-mono text-indigo-300 border border-slate-700">
+            <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 font-mono text-purple-300 border border-slate-800">
                 <p><strong>Banco:</strong> Banco Ejemplo</p>
                 <p><strong>CLABE:</strong> 1234 5678 9012 3456 78</p>
                 <p><strong>Titular:</strong> Tu Nombre</p>
@@ -132,7 +164,7 @@
                 Una vez verificado tu depósito, el administrador abonará tu saldo de inmediato.
             </p>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeTopUpModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-5 py-2 rounded-lg text-sm">
+                <button onclick="closeTopUpModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2 rounded-xl text-sm transition">
                     Entendido / Cerrar
                 </button>
             </div>
@@ -146,14 +178,25 @@
         let state = {
             balance: 0.00,
             products: [
-                { id: 'netflix', name: 'Netflix 1 Pantalla', price: 65.00, icon: 'fa-tv', color: 'text-red-500' },
-                { id: 'disney', name: 'Disney+ Premium', price: 50.00, icon: 'fa-wand-magic-sparkles', color: 'text-blue-400' },
-                { id: 'vix', name: 'ViX Premium', price: 40.00, icon: 'fa-film', color: 'text-orange-500' },
-                { id: 'spotify', name: 'Spotify 1 Mes', price: 35.00, icon: 'fa-music', color: 'text-emerald-400' }
+                { id: 'net_1m', name: 'Netflix Premium 1 Mes', price: 150.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'net_3m', name: 'Netflix 3 Meses', price: 400.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 90 },
+                { id: 'dis_p', name: 'Disney+ Premium', price: 120.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'dis_s', name: 'Disney+ Estándar', price: 90.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'vix_1m', name: 'ViX Premium 1 Mes', price: 80.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'vix_2m', name: 'ViX Premium 2 Meses', price: 150.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 60 },
+                { id: 'vix_6m', name: 'ViX Premium 6 Meses', price: 400.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 180 },
+                { id: 'vix_an', name: 'ViX Premium Anual', price: 750.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 365 },
+                { id: 'hbo_1m', name: 'HBO Max 1 Mes', price: 100.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'hbo_an', name: 'HBO Max Anual', price: 800.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 365 },
+                { id: 'spo_1m', name: 'Spotify 1 Mes', price: 60.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'spo_3m', name: 'Spotify 3 Meses', price: 160.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 90 },
+                { id: 'claro', name: 'Claro Video', price: 70.00, image: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'prime', name: 'Prime Video 1 Mes', price: 99.00, image: 'https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'para', name: 'Paramount+', price: 85.00, image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop', days: 30 }
             ],
             inventory: [
-                { id: 1, productId: 'netflix', credentials: 'demo_user1@netflix.com : Clave2026', status: 'available' },
-                { id: 2, productId: 'disney', credentials: 'demo_user2@disney.com : Clave2026', status: 'available' }
+                { id: 1, productId: 'net_1m', credentials: 'netflix_demo@mail.com : Pass123', codeLink: 'https://paneldecodigos.com/demo-link', status: 'available' },
+                { id: 2, productId: 'dis_p', credentials: 'disney_demo@mail.com : Pass123', codeLink: '', status: 'available' }
             ],
             purchases: []
         };
@@ -161,40 +204,75 @@
         function renderProducts() {
             const container = document.getElementById('products-grid');
             const selectAdmin = document.getElementById('stock-product-id');
+            const selectPrice = document.getElementById('price-product-id');
+            
             container.innerHTML = '';
             selectAdmin.innerHTML = '';
+            selectPrice.innerHTML = '';
 
             state.products.forEach(prod => {
                 const stockCount = state.inventory.filter(i => i.productId === prod.id && i.status === 'available').length;
 
                 selectAdmin.innerHTML += `<option value="${prod.id}">${prod.name}</option>`;
+                selectPrice.innerHTML += `<option value="${prod.id}">${prod.name}</option>`;
 
                 container.innerHTML += `
-                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 flex flex-col justify-between space-y-4">
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid ${prod.icon} ${prod.color} text-2xl"></i>
-                                <div>
-                                    <h3 class="font-bold">${prod.name}</h3>
-                                    <span class="text-xs ${stockCount > 0 ? 'text-emerald-400' : 'text-rose-400'} font-medium">
-                                        ${stockCount > 0 ? `${stockCount} disponibles` : 'Agotado'}
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="text-lg font-bold">$${prod.price.toFixed(2)}</span>
+                    <div class="bg-slate-900/90 rounded-2xl overflow-hidden border border-purple-900/30 hover:border-purple-500/50 transition-all flex flex-col justify-between shadow-lg hover:shadow-purple-500/10">
+                        <div class="relative h-36 w-full overflow-hidden bg-slate-950">
+                            <img src="${prod.image}" alt="${prod.name}" class="w-full h-full object-cover opacity-80 hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                            <span class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-xs px-2.5 py-1 rounded-full font-bold ${stockCount > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                                ${stockCount > 0 ? `${stockCount} disponible(s)` : 'Agotado'}
+                            </span>
                         </div>
-                        <button onclick="buyProduct('${prod.id}')" 
-                            ${stockCount === 0 ? 'disabled' : ''} 
-                            class="w-full py-2.5 rounded-lg font-medium text-sm transition ${
-                                stockCount > 0 
-                                ? 'bg-indigo-600 hover:bg-indigo-500 text-white' 
-                                : 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                            }">
-                            ${stockCount > 0 ? 'Comprar Ahora' : 'Sin Stock'}
-                        </button>
+                        <div class="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-white">${prod.name}</h3>
+                                <p class="text-xs text-slate-400 mt-1">Duración: ${prod.days} días</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="text-xl font-extrabold text-purple-300">$${prod.price.toFixed(2)} <span class="text-xs text-slate-400">MXN</span></span>
+                            </div>
+                            <button onclick="buyProduct('${prod.id}')" 
+                                ${stockCount === 0 ? 'disabled' : ''} 
+                                class="w-full py-2.5 rounded-xl font-bold text-sm transition shadow-lg ${
+                                    stockCount > 0 
+                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/20' 
+                                    : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                                }">
+                                ${stockCount > 0 ? 'Comprar Ahora' : 'Sin Stock'}
+                            </button>
+                        </div>
                     </div>
                 `;
             });
+
+            loadCurrentPrice();
+        }
+
+        function loadCurrentPrice() {
+            const prodId = document.getElementById('price-product-id').value;
+            const product = state.products.find(p => p.id === prodId);
+            if (product) {
+                document.getElementById('new-product-price').value = product.price;
+            }
+        }
+
+        function updateProductPrice() {
+            const prodId = document.getElementById('price-product-id').value;
+            const newPrice = parseFloat(document.getElementById('new-product-price').value);
+
+            if (!newPrice || newPrice <= 0) {
+                alert('Por favor ingresa un precio válido.');
+                return;
+            }
+
+            const product = state.products.find(p => p.id === prodId);
+            if (product) {
+                product.price = newPrice;
+                renderProducts();
+                alert(`El precio de "${product.name}" ha sido actualizado a $${newPrice.toFixed(2)} MXN.`);
+            }
         }
 
         function updateUI() {
@@ -209,12 +287,22 @@
             }
 
             state.purchases.forEach(item => {
+                const codeLinkHtml = item.codeLink 
+                    ? `<br><a href="${item.codeLink}" target="_blank" class="inline-block mt-1 text-xs text-sky-400 underline hover:text-sky-300"><i class="fa-solid fa-external-link"></i> Abrir Panel de Códigos / Hogar</a>` 
+                    : '';
+
                 list.innerHTML += `
                     <tr>
-                        <td class="p-3 font-medium">${item.productName}</td>
-                        <td class="p-3 font-mono text-xs text-indigo-300 bg-slate-900/50 rounded">${item.credentials}</td>
-                        <td class="p-3">$${item.price.toFixed(2)}</td>
-                        <td class="p-3 text-slate-400 text-xs">${item.date}</td>
+                        <td class="p-3 font-medium text-purple-200">${item.productName}</td>
+                        <td class="p-3 font-mono text-xs text-indigo-300 bg-slate-950/60 rounded-lg">
+                            ${item.credentials}
+                            ${codeLinkHtml}
+                        </td>
+                        <td class="p-3 font-bold text-emerald-400">$${item.price.toFixed(2)}</td>
+                        <td class="p-3 text-slate-400 text-xs">
+                            Comprado: ${item.date}<br>
+                            <span class="text-amber-400 font-semibold">Vence: ${item.expireDate}</span>
+                        </td>
                     </tr>
                 `;
             });
@@ -239,16 +327,29 @@
             const item = state.inventory[itemIndex];
             item.status = 'sold';
 
+            const expireDateObj = new Date();
+            expireDateObj.setDate(expireDateObj.getDate() + product.days);
+            const expireStr = expireDateObj.toLocaleDateString();
+
             state.purchases.unshift({
                 productName: product.name,
                 credentials: item.credentials,
+                codeLink: item.codeLink || '',
                 price: product.price,
-                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                date: new Date().toLocaleDateString(),
+                expireDate: expireStr
             });
 
             updateUI();
             renderProducts();
-            alert(`¡Compra Exitosa!\nTu cuenta: ${item.credentials}`);
+
+            let msg = `¡Compra Exitosa!\n\nCuenta: ${item.credentials}`;
+            if (item.codeLink) {
+                msg += `\nEnlace Panel de Códigos: ${item.codeLink}`;
+            }
+            msg += `\n\nFecha de Vencimiento: ${expireStr}`;
+
+            alert(msg);
         }
 
         function addCredit() {
@@ -256,13 +357,14 @@
             if (amount > 0) {
                 state.balance += amount;
                 updateUI();
-                alert(`Se han añadido $${amount.toFixed(2)} MXN al saldo del cliente.`);
+                alert(`Se han añadido $${amount.toFixed(2)} MXN al saldo.`);
             }
         }
 
         function addStock() {
             const prodId = document.getElementById('stock-product-id').value;
             const creds = document.getElementById('stock-credentials').value.trim();
+            const codeLink = document.getElementById('stock-code-link').value.trim();
 
             if (!creds) {
                 alert('Escribe las credenciales de la cuenta.');
@@ -273,10 +375,12 @@
                 id: Date.now(),
                 productId: prodId,
                 credentials: creds,
+                codeLink: codeLink,
                 status: 'available'
             });
 
             document.getElementById('stock-credentials').value = '';
+            document.getElementById('stock-code-link').value = '';
             renderProducts();
             alert('Cuenta guardada con éxito en el stock.');
         }
@@ -290,15 +394,8 @@
             }
         }
 
-        function openTopUpModal() { 
-            const modal = document.getElementById('topup-modal');
-            modal.classList.remove('hidden');
-        }
-
-        function closeTopUpModal() { 
-            const modal = document.getElementById('topup-modal');
-            modal.classList.add('hidden');
-        }
+        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
         function switchTab(tab) {
             document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
