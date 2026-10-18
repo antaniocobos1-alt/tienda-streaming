@@ -9,18 +9,84 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-purple-500 selection:text-white">
 
-    <!-- Navegación -->
+    <!-- Pantalla de Login / Registro -->
+    <div id="auth-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-purple-900/40 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl">
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play-circle text-purple-400"></i> Streaming Store
+                </h1>
+                <p class="text-xs text-slate-400">Inicia sesión o regístrate para acceder al catálogo</p>
+            </div>
+
+            <!-- Selector de Pestañas Auth -->
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+                <button id="btn-tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-purple-600 text-white transition">Iniciar Sesión</button>
+                <button id="btn-tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition">Registrarse</button>
+            </div>
+
+            <!-- Formulario Iniciar Sesión -->
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400">Usuario</label>
+                    <input type="text" id="login-username" required placeholder="Tu usuario" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Contraseña</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
+                    Ingresar a la Tienda
+                </button>
+            </form>
+
+            <!-- Formulario Registro -->
+            <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400">Nombre Completo</label>
+                    <input type="text" id="reg-fullname" required placeholder="Juan Pérez" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Nombre de Usuario</label>
+                    <input type="text" id="reg-username" required placeholder="juanperez123" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Contraseña</label>
+                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">
+                    Crear Cuenta e Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navegación Tienda -->
     <nav class="bg-slate-900/90 backdrop-blur-md border-b border-purple-900/40 p-4 sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
+        <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
+            <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
                 <i class="fa-solid fa-play-circle text-purple-400"></i> Streaming Store
             </h1>
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-purple-500/30 text-xs sm:text-sm">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- ID de Cliente -->
+                <div class="bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-purple-500/30 text-xs flex items-center gap-1.5">
+                    <span class="text-slate-400 hidden sm:inline">Mi ID:</span>
+                    <span id="user-client-id" class="text-purple-300 font-mono font-bold">CLI-0000</span>
+                    <button onclick="copyClientID()" class="text-slate-400 hover:text-white transition ml-1" title="Copiar ID">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                </div>
+                <!-- Saldo del Cliente -->
+                <div class="bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-emerald-500/30 text-xs sm:text-sm">
                     Saldo: <span id="user-balance" class="text-emerald-400 font-bold">$0.00</span> MXN
                 </div>
+                <!-- Botón Admin -->
                 <button onclick="openAdminModal()" class="text-xs bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-3 py-2 rounded-xl transition shadow-lg shadow-amber-500/20">
                     <i class="fa-solid fa-lock"></i> Admin
+                </button>
+                <!-- Cerrar Sesión -->
+                <button onclick="logout()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold p-2 rounded-xl transition" title="Cerrar Sesión">
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </div>
@@ -32,7 +98,10 @@
         <!-- Sección Tienda (Clientes) -->
         <section id="tab-shop" class="space-y-6">
             <div class="flex justify-between items-center flex-wrap gap-3">
-                <h2 class="text-2xl font-bold text-white tracking-wide">Catálogo de Cuentas</h2>
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-purple-400">Cliente</span> 👋</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Tu ID único de recarga es: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
+                </div>
                 <button onclick="openTopUpModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
                     <i class="fa-solid fa-wallet"></i> Recargar Saldo
                 </button>
@@ -100,18 +169,22 @@
                     </div>
                 </div>
 
-                <!-- Agregar Crédito -->
+                <!-- Agregar Crédito por ID de Cliente -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-plus-circle"></i> Agregar Crédito
+                        <i class="fa-solid fa-user-plus"></i> Recargar por ID de Cliente
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">Monto a abonar (MXN)</label>
-                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                            <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
+                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase focus:outline-none focus:border-emerald-500">
                         </div>
-                        <button onclick="addCredit()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">
-                            Añadir Crédito
+                        <div>
+                            <label class="text-xs text-slate-400">Monto a abonar (MXN)</label>
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <button onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">
+                            Añadir Crédito al ID
                         </button>
                     </div>
                 </div>
@@ -168,15 +241,19 @@
                 <i class="fa-solid fa-building-columns"></i> Cómo recargar saldo
             </h3>
             <p class="text-sm text-slate-300">
-                Realiza una transferencia o depósito con los siguientes datos y envía tu comprobante de pago:
+                Realiza una transferencia proporcionando tu ID de cliente:
             </p>
-            <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 font-mono text-purple-300 border border-slate-800">
-                <p><strong>Banco:</strong> Banco Ejemplo</p>
-                <p><strong>CLABE:</strong> 1234 5678 9012 3456 78</p>
-                <p><strong>Titular:</strong> Tu Nombre</p>
+            <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 border border-slate-800">
+                <p class="text-purple-300 font-bold">Tu ID de Cliente: <span id="modal-client-id" class="font-mono text-emerald-400">CLI-0000</span></p>
+                <div class="border-t border-slate-800 pt-2 font-mono text-xs text-slate-300 space-y-1">
+                    <p><strong>Banco:</strong> Banco Ejemplo</p>
+                    <p><strong>CLABE:</strong> 1234 5678 9012 3456 78</p>
+                    <p><strong>Titular:</strong> Tu Nombre</p>
+                    <p><strong>Concepto de Pago:</strong> <span id="modal-client-id-concept" class="text-purple-300">CLI-0000</span></p>
+                </div>
             </div>
             <p class="text-xs text-slate-400">
-                Una vez verificado tu depósito, el administrador abonará tu saldo de inmediato.
+                Envía tu comprobante con tu ID de cliente por WhatsApp. El administrador abonará tu saldo de inmediato.
             </p>
             <div class="flex justify-end gap-2 pt-2">
                 <button onclick="closeTopUpModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2 rounded-xl text-sm transition">
@@ -190,8 +267,9 @@
     <script>
         const ADMIN_PIN = "199720022019";
 
+        let currentUser = JSON.parse(localStorage.getItem('logged_user') || 'null');
+
         let state = {
-            balance: 0.00,
             products: [
                 { id: 'net_1m', name: 'Netflix Premium 1 Mes', price: 150.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 30 },
                 { id: 'net_3m', name: 'Netflix 3 Meses', price: 400.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 90 },
@@ -212,9 +290,85 @@
             inventory: [
                 { id: 1, productId: 'net_1m', credentials: 'netflix_demo@mail.com : Pass123', codeLink: 'https://paneldecodigos.com/demo-link', status: 'available' },
                 { id: 2, productId: 'dis_p', credentials: 'disney_demo@mail.com : Pass123', codeLink: '', status: 'available' }
-            ],
-            purchases: []
+            ]
         };
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const regForm = document.getElementById('form-register');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnReg = document.getElementById('btn-tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2 rounded-lg bg-purple-600 text-white transition";
+                btnReg.className = "flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                btnReg.className = "flex-1 py-2 rounded-lg bg-purple-600 text-white transition";
+                btnLogin.className = "flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition";
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-fullname').value.trim();
+            const username = document.getElementById('reg-username').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+
+            let users = JSON.parse(localStorage.getItem('app_users') || '{}');
+
+            if (users[username]) {
+                alert('Ese nombre de usuario ya está registrado.');
+                return;
+            }
+
+            const clientId = 'CLI-' + Math.floor(100000 + Math.random() * 900000);
+            const newUser = { name, username, password, clientId, balance: 0.00, purchases: [] };
+
+            users[username] = newUser;
+            localStorage.setItem('app_users', JSON.stringify(users));
+
+            currentUser = newUser;
+            localStorage.setItem('logged_user', JSON.stringify(currentUser));
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            initStore();
+            alert(`¡Registro exitoso! bienvenido/a ${name}.\nTu ID de recarga asignado es: ${clientId}`);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            let users = JSON.parse(localStorage.getItem('app_users') || '{}');
+
+            if (!users[username] || users[username].password !== password) {
+                alert('Usuario o contraseña incorrectos.');
+                return;
+            }
+
+            currentUser = users[username];
+            localStorage.setItem('logged_user', JSON.stringify(currentUser));
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            initStore();
+        }
+
+        function logout() {
+            localStorage.removeItem('logged_user');
+            currentUser = null;
+            location.reload();
+        }
+
+        function copyClientID() {
+            if (!currentUser) return;
+            navigator.clipboard.writeText(currentUser.clientId);
+            alert(`¡ID copiado al portapapeles!\nTu ID: ${currentUser.clientId}`);
+        }
 
         function renderProducts() {
             const container = document.getElementById('products-grid');
@@ -291,17 +445,24 @@
         }
 
         function updateUI() {
-            document.getElementById('user-balance').innerText = `$${state.balance.toFixed(2)}`;
+            if (!currentUser) return;
+
+            document.getElementById('welcome-username').innerText = currentUser.name;
+            document.getElementById('user-client-id').innerText = currentUser.clientId;
+            document.getElementById('user-id-banner').innerText = currentUser.clientId;
+            document.getElementById('modal-client-id').innerText = currentUser.clientId;
+            document.getElementById('modal-client-id-concept').innerText = currentUser.clientId;
+            document.getElementById('user-balance').innerText = `$${currentUser.balance.toFixed(2)}`;
             
             const list = document.getElementById('purchases-list');
             list.innerHTML = '';
 
-            if (state.purchases.length === 0) {
+            if (!currentUser.purchases || currentUser.purchases.length === 0) {
                 list.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Aún no has realizado ninguna compra.</td></tr>`;
                 return;
             }
 
-            state.purchases.forEach(item => {
+            currentUser.purchases.forEach(item => {
                 const codeLinkHtml = item.codeLink 
                     ? `<br><a href="${item.codeLink}" target="_blank" class="inline-block mt-1 text-xs text-sky-400 underline hover:text-sky-300"><i class="fa-solid fa-external-link"></i> Abrir Panel de Códigos / Hogar</a>` 
                     : '';
@@ -326,7 +487,7 @@
         function buyProduct(productId) {
             const product = state.products.find(p => p.id === productId);
 
-            if (state.balance < product.price) {
+            if (currentUser.balance < product.price) {
                 alert('Saldo insuficiente. Por favor realiza una recarga.');
                 openTopUpModal();
                 return;
@@ -338,7 +499,8 @@
                 return;
             }
 
-            state.balance -= product.price;
+            currentUser.balance -= product.price;
+
             const item = state.inventory[itemIndex];
             item.status = 'sold';
 
@@ -346,7 +508,9 @@
             expireDateObj.setDate(expireDateObj.getDate() + product.days);
             const expireStr = expireDateObj.toLocaleDateString();
 
-            state.purchases.unshift({
+            if (!currentUser.purchases) currentUser.purchases = [];
+
+            currentUser.purchases.unshift({
                 productName: product.name,
                 credentials: item.credentials,
                 codeLink: item.codeLink || '',
@@ -354,6 +518,12 @@
                 date: new Date().toLocaleDateString(),
                 expireDate: expireStr
             });
+
+            // Guardar cambios en el usuario
+            let users = JSON.parse(localStorage.getItem('app_users') || '{}');
+            users[currentUser.username] = currentUser;
+            localStorage.setItem('app_users', JSON.stringify(users));
+            localStorage.setItem('logged_user', JSON.stringify(currentUser));
 
             updateUI();
             renderProducts();
@@ -367,13 +537,39 @@
             alert(msg);
         }
 
-        function addCredit() {
+        function addCreditByClientID() {
+            const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
-            if (amount > 0) {
-                state.balance += amount;
-                updateUI();
-                alert(`Se han añadido $${amount.toFixed(2)} MXN al saldo.`);
+
+            if (!targetClientId) {
+                alert('Ingresa el ID del cliente.');
+                return;
             }
+
+            if (!amount || amount <= 0) {
+                alert('Ingresa un monto válido.');
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('app_users') || '{}');
+            let userFoundKey = Object.keys(users).find(k => users[k].clientId === targetClientId);
+
+            if (!userFoundKey) {
+                alert('No se encontró ningún cliente registrado con ese ID.');
+                return;
+            }
+
+            users[userFoundKey].balance += amount;
+            localStorage.setItem('app_users', JSON.stringify(users));
+
+            if (currentUser && currentUser.clientId === targetClientId) {
+                currentUser.balance += amount;
+                localStorage.setItem('logged_user', JSON.stringify(currentUser));
+                updateUI();
+            }
+
+            document.getElementById('add-credit-client-id').value = '';
+            alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente con ID ${targetClientId}.`);
         }
 
         function addStock() {
@@ -429,8 +625,17 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        renderProducts();
-        updateUI();
+        function initStore() {
+            if (currentUser) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                renderProducts();
+                updateUI();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+            }
+        }
+
+        initStore();
     </script>
 </body>
 </html>
