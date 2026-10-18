@@ -146,7 +146,31 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Editar Datos Bancarios -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-building-columns"></i> Datos Bancarios
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Nombre del Banco</label>
+                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA / Banamex" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">CLABE / Número de Cuenta</label>
+                            <input type="text" id="admin-bank-clabe" placeholder="1234 5678 9012 3456 78" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Titular de la Cuenta</label>
+                            <input type="text" id="admin-bank-holder" placeholder="Nombre completo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <button onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">
+                            Guardar Datos Bancarios
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Modificar Precios -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
@@ -172,7 +196,7 @@
                 <!-- Agregar Crédito por ID de Cliente -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Recargar por ID de Cliente
+                        <i class="fa-solid fa-user-plus"></i> Recargar por ID
                     </h3>
                     <div class="space-y-3">
                         <div>
@@ -234,30 +258,41 @@
         </div>
     </div>
 
-    <!-- Modal Recargar Saldo -->
+    <!-- Modal Recargar Saldo con Botón de WhatsApp -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-purple-400 flex items-center gap-2">
                 <i class="fa-solid fa-building-columns"></i> Cómo recargar saldo
             </h3>
             <p class="text-sm text-slate-300">
-                Realiza una transferencia proporcionando tu ID de cliente:
+                Realiza una transferencia proporcionando tu ID de cliente y concepto:
             </p>
             <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 border border-slate-800">
                 <p class="text-purple-300 font-bold">Tu ID de Cliente: <span id="modal-client-id" class="font-mono text-emerald-400">CLI-0000</span></p>
                 <div class="border-t border-slate-800 pt-2 font-mono text-xs text-slate-300 space-y-1">
-                    <p><strong>Banco:</strong> Banco Ejemplo</p>
-                    <p><strong>CLABE:</strong> 1234 5678 9012 3456 78</p>
-                    <p><strong>Titular:</strong> Tu Nombre</p>
+                    <p><strong>Banco:</strong> <span id="display-bank-name" class="text-white">Banco Ejemplo</span></p>
+                    <p><strong>CLABE:</strong> <span id="display-bank-clabe" class="text-white">1234 5678 9012 3456 78</span></p>
+                    <p><strong>Titular:</strong> <span id="display-bank-holder" class="text-white">Tu Nombre</span></p>
                     <p><strong>Concepto de Pago:</strong> <span id="modal-client-id-concept" class="text-purple-300">CLI-0000</span></p>
                 </div>
             </div>
+
+            <!-- Subir Captura de Pago -->
+            <div class="space-y-1.5">
+                <label class="text-xs text-slate-400 block">Sube tu captura de pago (opcional):</label>
+                <input type="file" id="payment-screenshot" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+            </div>
+
             <p class="text-xs text-slate-400">
-                Envía tu comprobante con tu ID de cliente por WhatsApp. El administrador abonará tu saldo de inmediato.
+                Haz clic en el botón para enviar tu comprobante directamente por WhatsApp.
             </p>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeTopUpModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2 rounded-xl text-sm transition">
-                    Entendido / Cerrar
+
+            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2">
+                <button onclick="sendWhatsAppProof()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante por WhatsApp
+                </button>
+                <button onclick="closeTopUpModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
+                    Cerrar
                 </button>
             </div>
         </div>
@@ -266,8 +301,15 @@
     <!-- Script JavaScript -->
     <script>
         const ADMIN_PIN = "199720022019";
+        const ADMIN_PHONE = "9241955327";
 
         let currentUser = JSON.parse(localStorage.getItem('logged_user') || 'null');
+
+        let bankConfig = JSON.parse(localStorage.getItem('bank_config') || JSON.stringify({
+            bank: 'Banco Ejemplo',
+            clabe: '1234 5678 9012 3456 78',
+            holder: 'Tu Nombre'
+        }));
 
         let state = {
             products: [
@@ -336,7 +378,7 @@
 
             document.getElementById('auth-screen').classList.add('hidden');
             initStore();
-            alert(`¡Registro exitoso! bienvenido/a ${name}.\nTu ID de recarga asignado es: ${clientId}`);
+            alert(`¡Registro exitoso! Bienvenido/a ${name}.\nTu ID de recarga asignado es: ${clientId}`);
         }
 
         function handleLogin(e) {
@@ -368,6 +410,13 @@
             if (!currentUser) return;
             navigator.clipboard.writeText(currentUser.clientId);
             alert(`¡ID copiado al portapapeles!\nTu ID: ${currentUser.clientId}`);
+        }
+
+        function sendWhatsAppProof() {
+            if (!currentUser) return;
+            const message = `Hola, acabo de realizar una recarga.\nMi ID de cliente es: *${currentUser.clientId}*\nNombre: *${currentUser.name}*\nAdjunto mi comprobante de pago.`;
+            const whatsappUrl = `https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
         }
 
         function renderProducts() {
@@ -444,7 +493,31 @@
             }
         }
 
+        function updateBankInfo() {
+            const bank = document.getElementById('admin-bank-name').value.trim();
+            const clabe = document.getElementById('admin-bank-clabe').value.trim();
+            const holder = document.getElementById('admin-bank-holder').value.trim();
+
+            if (!bank || !clabe || !holder) {
+                alert('Por favor completa todos los campos bancarios.');
+                return;
+            }
+
+            bankConfig = { bank, clabe, holder };
+            localStorage.setItem('bank_config', JSON.stringify(bankConfig));
+            updateUI();
+            alert('¡Datos bancarios actualizados con éxito!');
+        }
+
         function updateUI() {
+            document.getElementById('display-bank-name').innerText = bankConfig.bank;
+            document.getElementById('display-bank-clabe').innerText = bankConfig.clabe;
+            document.getElementById('display-bank-holder').innerText = bankConfig.holder;
+            
+            document.getElementById('admin-bank-name').value = bankConfig.bank;
+            document.getElementById('admin-bank-clabe').value = bankConfig.clabe;
+            document.getElementById('admin-bank-holder').value = bankConfig.holder;
+
             if (!currentUser) return;
 
             document.getElementById('welcome-username').innerText = currentUser.name;
@@ -519,7 +592,6 @@
                 expireDate: expireStr
             });
 
-            // Guardar cambios en el usuario
             let users = JSON.parse(localStorage.getItem('app_users') || '{}');
             users[currentUser.username] = currentUser;
             localStorage.setItem('app_users', JSON.stringify(users));
