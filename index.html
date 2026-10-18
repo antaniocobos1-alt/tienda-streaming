@@ -138,7 +138,8 @@
                                 <th class="p-3">Servicio</th>
                                 <th class="p-3">Credenciales / Panel</th>
                                 <th class="p-3">Precio</th>
-                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Fecha y Vencimiento</th>
+                                <th class="p-3">Estado</th>
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-slate-800"></tbody>
@@ -283,13 +284,24 @@
         let currentUser = JSON.parse(localStorage.getItem('logged_user') || 'null');
         let bankConfig = { bank: 'BBVA', clabe: '1234567890', holder: 'Admin' };
 
+        // Lista exacta de productos solicitada
         let state = {
             products: [
-                { id: 'net_1m', name: 'Netflix Premium 1 Mes', price: 150.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'dis_p', name: 'Disney+ Premium', price: 120.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'vix_1m', name: 'ViX Premium 1 Mes', price: 80.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'hbo_1m', name: 'HBO Max 1 Mes', price: 100.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'spo_1m', name: 'Spotify 1 Mes', price: 60.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 30 }
+                { id: 'net_1m', name: 'Netflix premium mes', price: 150.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'net_3m', name: 'Netflix 3 mes', price: 400.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 90 },
+                { id: 'dis_p', name: 'Disney premium', price: 120.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'dis_e', name: 'Disney estándar', price: 90.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'vix_1m', name: 'vix premium 1 mes', price: 80.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'vix_2m', name: 'vix premium 2 mes', price: 150.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 60 },
+                { id: 'hbo_m', name: 'Hbo mes', price: 100.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'hbo_a', name: 'Hbo anual', price: 800.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 365 },
+                { id: 'spo_1m', name: 'Spotify de mes', price: 60.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'spo_3m', name: 'Spotify de 3 mes', price: 160.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 90 },
+                { id: 'vix_6m', name: 'vix premium 6 mes', price: 400.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 180 },
+                { id: 'vix_anual', name: 'vix premium anual', price: 750.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 365 },
+                { id: 'claro', name: 'Claro video', price: 70.00, image: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'prime_m', name: 'Prime video mes', price: 99.00, image: 'https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?w=500&auto=format&fit=crop', days: 30 },
+                { id: 'para', name: 'Paramount', price: 85.00, image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop', days: 30 }
             ],
             inventory: [
                 { id: 1, productId: 'net_1m', credentials: 'demo@mail.com : Pass123', codeLink: '', status: 'available' }
@@ -297,7 +309,6 @@
         };
 
         window.addEventListener('firebase-ready', () => {
-            // Escuchar cambios de banco
             window.dbOnValue(window.dbRef(window.db, 'config/bank'), (snapshot) => {
                 if (snapshot.exists()) {
                     bankConfig = snapshot.val();
@@ -305,7 +316,6 @@
                 }
             });
 
-            // Escuchar el saldo del cliente en tiempo real mediante su ID de cliente
             if (currentUser && currentUser.clientId) {
                 window.dbOnValue(window.dbRef(window.db, `clients/${currentUser.clientId}`), (snapshot) => {
                     if (snapshot.exists()) {
@@ -410,6 +420,8 @@
                     </div>
                 `;
             });
+
+            loadCurrentPrice();
         }
 
         function loadCurrentPrice() {
@@ -452,6 +464,41 @@
             document.getElementById('modal-client-id').innerText = currentUser.clientId;
             document.getElementById('modal-client-id-concept').innerText = currentUser.clientId;
             document.getElementById('user-balance').innerText = `$${(currentUser.balance || 0).toFixed(2)}`;
+
+            // Renderizar Historial de Compras con Recordatorio de Vencimiento
+            const purchasesList = document.getElementById('purchases-list');
+            if (purchasesList) {
+                purchasesList.innerHTML = '';
+                if (!currentUser.purchases || currentUser.purchases.length === 0) {
+                    purchasesList.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Aún no has comprado cuentas.</td></tr>`;
+                } else {
+                    const today = new Date();
+                    currentUser.purchases.forEach(item => {
+                        const expireDate = new Date(item.expireDateRaw || item.expireDate);
+                        const diffTime = expireDate - today;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        let statusBadge = '';
+                        if (diffDays < 0) {
+                            statusBadge = `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-circle-xmark"></i> Vencida</span>`;
+                        } else if (diffDays <= 3) {
+                            statusBadge = `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-xs font-bold animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Vence en ${diffDays} día(s)</span>`;
+                        } else {
+                            statusBadge = `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-circle-check"></i> Activa (${diffDays}d)</span>`;
+                        }
+
+                        purchasesList.innerHTML += `
+                            <tr>
+                                <td class="p-3 font-medium text-purple-200">${item.productName}</td>
+                                <td class="p-3 font-mono text-xs text-indigo-300 bg-slate-950/60 rounded-lg">${item.credentials}</td>
+                                <td class="p-3 font-bold text-emerald-400">$${item.price.toFixed(2)}</td>
+                                <td class="p-3 text-slate-400 text-xs">Comprado: ${item.date}<br><span class="text-amber-400 font-semibold">Vence: ${item.expireDate}</span></td>
+                                <td class="p-3">${statusBadge}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
         }
 
         async function buyProduct(productId) {
@@ -471,8 +518,21 @@
             const item = state.inventory[itemIndex];
             item.status = 'sold';
 
+            const expireDateObj = new Date();
+            expireDateObj.setDate(expireDateObj.getDate() + product.days);
+
+            if (!currentUser.purchases) currentUser.purchases = [];
+            currentUser.purchases.unshift({
+                productName: product.name,
+                credentials: item.credentials,
+                price: product.price,
+                date: new Date().toLocaleDateString(),
+                expireDate: expireDateObj.toLocaleDateString(),
+                expireDateRaw: expireDateObj.toISOString()
+            });
+
             await window.dbSet(window.dbRef(window.db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
-            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}/balance`), currentUser.balance);
+            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}`), currentUser);
 
             updateUI();
             renderProducts();
