@@ -7,10 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Firebase SDKs -->
+    <!-- SDK Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDha0rM7tpYgfP8_pSBtwlF1k1QQVRn50k",
@@ -19,8 +19,7 @@
           projectId: "tienda-streaming-c1b24",
           storageBucket: "tienda-streaming-c1b24.firebasestorage.app",
           messagingSenderId: "876184417584",
-          appId: "1:876184417584:web:1db078857a90bf10ee44f5",
-          measurementId: "G-W43PX143HB"
+          appId: "1:876184417584:web:1db078857a90bf10ee44f5"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -30,32 +29,28 @@
         window.dbRef = ref;
         window.dbSet = set;
         window.dbGet = get;
-        window.dbUpdate = update;
         window.dbOnValue = onValue;
 
-        // Disparar evento de carga de Firebase
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-purple-500 selection:text-white">
 
-    <!-- Pantalla de Login / Registro -->
+    <!-- Pantalla Auth -->
     <div id="auth-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-purple-900/40 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl">
             <div class="text-center space-y-2">
                 <h1 class="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center justify-center gap-2">
                     <i class="fa-solid fa-play-circle text-purple-400"></i> Streaming Store
                 </h1>
-                <p class="text-xs text-slate-400">Inicia sesión o regístrate para acceder al catálogo</p>
+                <p class="text-xs text-slate-400">Inicia sesión o regístrate para acceder</p>
             </div>
 
-            <!-- Selector de Pestañas Auth -->
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
                 <button type="button" id="btn-tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-purple-600 text-white transition">Iniciar Sesión</button>
                 <button type="button" id="btn-tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition">Registrarse</button>
             </div>
 
-            <!-- Formulario Iniciar Sesión -->
             <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="text-xs text-slate-400">Usuario</label>
@@ -70,7 +65,6 @@
                 </button>
             </form>
 
-            <!-- Formulario Registro -->
             <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-4">
                 <div>
                     <label class="text-xs text-slate-400">Nombre Completo</label>
@@ -91,7 +85,7 @@
         </div>
     </div>
 
-    <!-- Navegación Tienda -->
+    <!-- Navegación -->
     <nav class="bg-slate-900/90 backdrop-blur-md border-b border-purple-900/40 p-4 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
             <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
@@ -120,8 +114,6 @@
 
     <!-- Contenido Principal -->
     <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
-
-        <!-- Sección Tienda (Clientes) -->
         <section id="tab-shop" class="space-y-6">
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <div>
@@ -133,12 +125,8 @@
                 </button>
             </div>
 
-            <!-- Grilla de Productos -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid">
-                <!-- Se cargan dinámicamente -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <!-- Historial de Compras -->
             <div class="bg-slate-900/80 rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-purple-300">
                     <i class="fa-solid fa-clock-rotate-left"></i> Mis Cuentas Compradas
@@ -148,20 +136,18 @@
                         <thead class="bg-slate-950 text-slate-400">
                             <tr>
                                 <th class="p-3">Servicio</th>
-                                <th class="p-3">Credenciales / Panel de Códigos</th>
+                                <th class="p-3">Credenciales / Panel</th>
                                 <th class="p-3">Precio</th>
-                                <th class="p-3">Fecha y Vencimiento</th>
+                                <th class="p-3">Fecha</th>
                             </tr>
                         </thead>
-                        <tbody id="purchases-list" class="divide-y divide-slate-800">
-                            <!-- Se carga dinámicamente -->
-                        </tbody>
+                        <tbody id="purchases-list" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- Panel de Administración -->
+        <!-- Panel Admin -->
         <section id="tab-admin" class="hidden space-y-6">
             <div class="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-amber-500/30 shadow-xl">
                 <h2 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
@@ -173,191 +159,145 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Editar Datos Bancarios -->
+                <!-- Datos Bancarios -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
                         <i class="fa-solid fa-building-columns"></i> Datos Bancarios
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">Nombre del Banco</label>
-                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA / Banamex" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-blue-500">
+                            <label class="text-xs text-slate-400">Banco</label>
+                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">CLABE / Número de Cuenta</label>
-                            <input type="text" id="admin-bank-clabe" placeholder="1234 5678 9012 3456 78" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-blue-500">
+                            <label class="text-xs text-slate-400">CLABE</label>
+                            <input type="text" id="admin-bank-clabe" placeholder="1234..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Titular de la Cuenta</label>
-                            <input type="text" id="admin-bank-holder" placeholder="Nombre completo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-blue-500">
+                            <label class="text-xs text-slate-400">Titular</label>
+                            <input type="text" id="admin-bank-holder" placeholder="Nombre..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">
-                            Guardar Datos Bancarios
-                        </button>
+                        <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar</button>
                     </div>
                 </div>
 
                 <!-- Modificar Precios -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
-                        <i class="fa-solid fa-tags"></i> Modificar Precios
+                        <i class="fa-solid fa-tags"></i> Precios
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">Seleccionar Producto</label>
-                            <select id="price-product-id" onchange="loadCurrentPrice()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
-                                <!-- Opciones cargadas por JS -->
-                            </select>
+                            <label class="text-xs text-slate-400">Producto</label>
+                            <select id="price-product-id" onchange="loadCurrentPrice()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Nuevo Precio (MXN)</label>
-                            <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                            <label class="text-xs text-slate-400">Nuevo Precio</label>
+                            <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">
-                            Actualizar Precio
-                        </button>
+                        <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar</button>
                     </div>
                 </div>
 
-                <!-- Agregar Crédito por ID de Cliente -->
+                <!-- Recargar por ID -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Recargar por ID
+                        <i class="fa-solid fa-user-plus"></i> Recargar ID
                     </h3>
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
-                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase focus:outline-none focus:border-emerald-500">
+                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Monto a abonar (MXN)</label>
-                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-emerald-500">
+                            <label class="text-xs text-slate-400">Monto MXN</label>
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">
-                            Añadir Crédito al ID
-                        </button>
+                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito</button>
                     </div>
                 </div>
 
                 <!-- Cargar Stock -->
                 <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-purple-400 flex items-center gap-2">
-                        <i class="fa-solid fa-box-archive"></i> Cargar Inventario
+                        <i class="fa-solid fa-box-archive"></i> Inventario
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">Seleccionar Producto</label>
-                            <select id="stock-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
-                                <!-- Opciones cargadas por JS -->
-                            </select>
+                            <label class="text-xs text-slate-400">Producto</label>
+                            <select id="stock-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Credenciales (correo:contraseña)</label>
-                            <input type="text" id="stock-credentials" placeholder="correo@mail.com : clave123" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                            <label class="text-xs text-slate-400">Credenciales</label>
+                            <input type="text" id="stock-credentials" placeholder="correo : clave" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Enlace Panel de Códigos / Hogar (Opcional)</label>
-                            <input type="text" id="stock-code-link" placeholder="https://paneldecodigos.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                            <label class="text-xs text-slate-400">Link Panel (Opcional)</label>
+                            <input type="text" id="stock-code-link" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="addStock()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition">
-                            Guardar en Stock
-                        </button>
+                        <button type="button" onclick="addStock()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- Modal Acceso Admin Secreto -->
+    <!-- Modal Admin -->
     <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
         <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
-            <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-user-shield"></i> Acceso Administrador
-            </h3>
-            <p class="text-xs text-slate-300">Ingresa la clave secreta de acceso:</p>
-            <input type="password" id="admin-pin-input" placeholder="••••••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-lg tracking-widest text-white focus:outline-none focus:border-amber-500">
-            <div class="flex justify-end gap-2 pt-2">
-                <button type="button" onclick="closeAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-2 rounded-xl text-xs transition">Cancelar</button>
-                <button type="button" onclick="verifyAdminPIN()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-5 py-2 rounded-xl text-xs transition">Ingresar</button>
+            <h3 class="text-lg font-bold text-amber-400">Acceso Administrador</h3>
+            <input type="password" id="admin-pin-input" placeholder="••••••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-lg text-white">
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeAdminModal()" class="bg-slate-800 px-4 py-2 rounded-xl text-xs">Cancelar</button>
+                <button type="button" onclick="verifyAdminPIN()" class="bg-amber-600 px-5 py-2 rounded-xl text-xs font-bold">Ingresar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Recargar Saldo -->
+    <!-- Modal Recarga -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-purple-400 flex items-center gap-2">
-                <i class="fa-solid fa-building-columns"></i> Cómo recargar saldo
-            </h3>
-            <p class="text-sm text-slate-300">
-                Realiza una transferencia proporcionando tu ID de cliente y concepto:
-            </p>
+            <h3 class="text-xl font-bold text-purple-400">Cómo recargar saldo</h3>
             <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 border border-slate-800">
-                <p class="text-purple-300 font-bold">Tu ID de Cliente: <span id="modal-client-id" class="font-mono text-emerald-400">CLI-0000</span></p>
+                <p class="text-purple-300 font-bold">Tu ID: <span id="modal-client-id" class="font-mono text-emerald-400">CLI-0000</span></p>
                 <div class="border-t border-slate-800 pt-2 font-mono text-xs text-slate-300 space-y-1">
-                    <p><strong>Banco:</strong> <span id="display-bank-name" class="text-white">Banco Ejemplo</span></p>
-                    <p><strong>CLABE:</strong> <span id="display-bank-clabe" class="text-white">1234 5678 9012 3456 78</span></p>
-                    <p><strong>Titular:</strong> <span id="display-bank-holder" class="text-white">Tu Nombre</span></p>
-                    <p><strong>Concepto de Pago:</strong> <span id="modal-client-id-concept" class="text-purple-300">CLI-0000</span></p>
+                    <p><strong>Banco:</strong> <span id="display-bank-name" class="text-white">--</span></p>
+                    <p><strong>CLABE:</strong> <span id="display-bank-clabe" class="text-white">--</span></p>
+                    <p><strong>Titular:</strong> <span id="display-bank-holder" class="text-white">--</span></p>
+                    <p><strong>Concepto:</strong> <span id="modal-client-id-concept" class="text-purple-300">CLI-0000</span></p>
                 </div>
             </div>
-
-            <!-- Subir Captura de Pago -->
-            <div class="space-y-1.5">
-                <label class="text-xs text-slate-400 block">Sube tu captura de pago (opcional):</label>
-                <input type="file" id="payment-screenshot" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
-            </div>
-
-            <p class="text-xs text-slate-400">
-                Haz clic en el botón para enviar tu comprobante directamente por WhatsApp.
-            </p>
-
             <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2">
-                <button type="button" onclick="sendWhatsAppProof()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante por WhatsApp
+                <button type="button" onclick="sendWhatsAppProof()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante
                 </button>
-                <button type="button" onclick="closeTopUpModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
-                    Cerrar
-                </button>
+                <button type="button" onclick="closeTopUpModal()" class="bg-slate-800 px-4 py-2.5 rounded-xl text-sm">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Script JavaScript y Sincronización en la Nube -->
     <script>
         const ADMIN_PIN = "199720022019";
         const ADMIN_PHONE = "9241955327";
 
         let currentUser = JSON.parse(localStorage.getItem('logged_user') || 'null');
-        let bankConfig = { bank: 'Banco Ejemplo', clabe: '1234 5678 9012 3456 78', holder: 'Tu Nombre' };
+        let bankConfig = { bank: 'BBVA', clabe: '1234567890', holder: 'Admin' };
 
         let state = {
             products: [
                 { id: 'net_1m', name: 'Netflix Premium 1 Mes', price: 150.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'net_3m', name: 'Netflix 3 Meses', price: 400.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 90 },
                 { id: 'dis_p', name: 'Disney+ Premium', price: 120.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'dis_s', name: 'Disney+ Estándar', price: 90.00, image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop', days: 30 },
                 { id: 'vix_1m', name: 'ViX Premium 1 Mes', price: 80.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'vix_2m', name: 'ViX Premium 2 Meses', price: 150.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 60 },
-                { id: 'vix_6m', name: 'ViX Premium 6 Meses', price: 400.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 180 },
-                { id: 'vix_an', name: 'ViX Premium Anual', price: 750.00, image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop', days: 365 },
                 { id: 'hbo_1m', name: 'HBO Max 1 Mes', price: 100.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'hbo_an', name: 'HBO Max Anual', price: 800.00, image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop', days: 365 },
-                { id: 'spo_1m', name: 'Spotify 1 Mes', price: 60.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'spo_3m', name: 'Spotify 3 Meses', price: 160.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 90 },
-                { id: 'claro', name: 'Claro Video', price: 70.00, image: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'prime', name: 'Prime Video 1 Mes', price: 99.00, image: 'https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?w=500&auto=format&fit=crop', days: 30 },
-                { id: 'para', name: 'Paramount+', price: 85.00, image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop', days: 30 }
+                { id: 'spo_1m', name: 'Spotify 1 Mes', price: 60.00, image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=500&auto=format&fit=crop', days: 30 }
             ],
             inventory: [
-                { id: 1, productId: 'net_1m', credentials: 'netflix_demo@mail.com : Pass123', codeLink: 'https://paneldecodigos.com/demo-link', status: 'available' },
-                { id: 2, productId: 'dis_p', credentials: 'disney_demo@mail.com : Pass123', codeLink: '', status: 'available' }
+                { id: 1, productId: 'net_1m', credentials: 'demo@mail.com : Pass123', codeLink: '', status: 'available' }
             ]
         };
 
         window.addEventListener('firebase-ready', () => {
-            // Escuchar cambios del banco en la nube
+            // Escuchar cambios de banco
             window.dbOnValue(window.dbRef(window.db, 'config/bank'), (snapshot) => {
                 if (snapshot.exists()) {
                     bankConfig = snapshot.val();
@@ -365,11 +305,12 @@
                 }
             });
 
-            // Si hay usuario logueado, escuchar cambios en su saldo en tiempo real en la nube
-            if (currentUser) {
-                window.dbOnValue(window.dbRef(window.db, `users/${currentUser.username}`), (snapshot) => {
+            // Escuchar el saldo del cliente en tiempo real mediante su ID de cliente
+            if (currentUser && currentUser.clientId) {
+                window.dbOnValue(window.dbRef(window.db, `clients/${currentUser.clientId}`), (snapshot) => {
                     if (snapshot.exists()) {
-                        currentUser = snapshot.val();
+                        const cloudData = snapshot.val();
+                        currentUser.balance = parseFloat(cloudData.balance || 0);
                         localStorage.setItem('logged_user', JSON.stringify(currentUser));
                         updateUI();
                     }
@@ -378,22 +319,8 @@
         });
 
         function switchAuthTab(tab) {
-            const loginForm = document.getElementById('form-login');
-            const regForm = document.getElementById('form-register');
-            const btnLogin = document.getElementById('btn-tab-login');
-            const btnReg = document.getElementById('btn-tab-register');
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                regForm.classList.add('hidden');
-                btnLogin.className = "flex-1 py-2 rounded-lg bg-purple-600 text-white transition";
-                btnReg.className = "flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition";
-            } else {
-                loginForm.classList.add('hidden');
-                regForm.classList.remove('hidden');
-                btnReg.className = "flex-1 py-2 rounded-lg bg-purple-600 text-white transition";
-                btnLogin.className = "flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition";
-            }
+            document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
         }
 
         async function handleRegister(e) {
@@ -402,16 +329,11 @@
             const username = document.getElementById('reg-username').value.trim().toLowerCase();
             const password = document.getElementById('reg-password').value;
 
-            if (!name || !username || !password) {
-                alert('Completa todos los campos para registrarte.');
-                return;
-            }
-
             const userRef = window.dbRef(window.db, `users/${username}`);
             const snapshot = await window.dbGet(userRef);
 
             if (snapshot.exists()) {
-                alert('Ese nombre de usuario ya está registrado.');
+                alert('Ese usuario ya existe.');
                 return;
             }
 
@@ -419,13 +341,11 @@
             const newUser = { name, username, password, clientId, balance: 0.00, purchases: [] };
 
             await window.dbSet(userRef, newUser);
+            await window.dbSet(window.dbRef(window.db, `clients/${clientId}`), { username, balance: 0.00 });
 
             currentUser = newUser;
             localStorage.setItem('logged_user', JSON.stringify(currentUser));
-
-            document.getElementById('auth-screen').classList.add('hidden');
-            initStore();
-            alert(`¡Registro exitoso! Bienvenido/a ${name}.\nTu ID de recarga asignado es: ${clientId}`);
+            location.reload();
         }
 
         async function handleLogin(e) {
@@ -433,13 +353,7 @@
             const username = document.getElementById('login-username').value.trim().toLowerCase();
             const password = document.getElementById('login-password').value;
 
-            if (!username || !password) {
-                alert('Ingresa tu usuario y contraseña.');
-                return;
-            }
-
-            const userRef = window.dbRef(window.db, `users/${username}`);
-            const snapshot = await window.dbGet(userRef);
+            const snapshot = await window.dbGet(window.dbRef(window.db, `users/${username}`));
 
             if (!snapshot.exists() || snapshot.val().password !== password) {
                 alert('Usuario o contraseña incorrectos.');
@@ -448,28 +362,24 @@
 
             currentUser = snapshot.val();
             localStorage.setItem('logged_user', JSON.stringify(currentUser));
-
-            document.getElementById('auth-screen').classList.add('hidden');
-            initStore();
+            location.reload();
         }
 
         function logout() {
             localStorage.removeItem('logged_user');
-            currentUser = null;
             location.reload();
         }
 
         function copyClientID() {
             if (!currentUser) return;
             navigator.clipboard.writeText(currentUser.clientId);
-            alert(`¡ID copiado al portapapeles!\nTu ID: ${currentUser.clientId}`);
+            alert(`ID copiado: ${currentUser.clientId}`);
         }
 
         function sendWhatsAppProof() {
             if (!currentUser) return;
-            const message = `Hola, acabo de realizar una recarga.\nMi ID de cliente es: *${currentUser.clientId}*\nNombre: *${currentUser.name}*\nAdjunto mi comprobante de pago.`;
-            const whatsappUrl = `https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
+            const message = `Hola, recargué mi cuenta.\nMi ID de cliente es: *${currentUser.clientId}*\nNombre: *${currentUser.name}*`;
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         function renderProducts() {
@@ -488,61 +398,34 @@
                 selectPrice.innerHTML += `<option value="${prod.id}">${prod.name}</option>`;
 
                 container.innerHTML += `
-                    <div class="bg-slate-900/90 rounded-2xl overflow-hidden border border-purple-900/30 hover:border-purple-500/50 transition-all flex flex-col justify-between shadow-lg hover:shadow-purple-500/10">
-                        <div class="relative h-36 w-full overflow-hidden bg-slate-950">
-                            <img src="${prod.image}" alt="${prod.name}" class="w-full h-full object-cover opacity-80 hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-                            <span class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-xs px-2.5 py-1 rounded-full font-bold ${stockCount > 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${stockCount > 0 ? `${stockCount} disponible(s)` : 'Agotado'}
-                            </span>
+                    <div class="bg-slate-900 rounded-2xl p-5 border border-purple-900/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-white">${prod.name}</h3>
+                            <p class="text-xs text-slate-400">Stock: ${stockCount}</p>
                         </div>
-                        <div class="p-5 space-y-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-lg text-white">${prod.name}</h3>
-                                <p class="text-xs text-slate-400 mt-1">Duración: ${prod.days} días</p>
-                            </div>
-                            <div class="flex justify-between items-center pt-2">
-                                <span class="text-xl font-extrabold text-purple-300">$${prod.price.toFixed(2)} <span class="text-xs text-slate-400">MXN</span></span>
-                            </div>
-                            <button type="button" onclick="buyProduct('${prod.id}')" 
-                                ${stockCount === 0 ? 'disabled' : ''} 
-                                class="w-full py-2.5 rounded-xl font-bold text-sm transition shadow-lg ${
-                                    stockCount > 0 
-                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/20' 
-                                    : 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                                }">
-                                ${stockCount > 0 ? 'Comprar Ahora' : 'Sin Stock'}
-                            </button>
-                        </div>
+                        <div class="text-xl font-extrabold text-purple-300">$${prod.price.toFixed(2)} MXN</div>
+                        <button type="button" onclick="buyProduct('${prod.id}')" ${stockCount === 0 ? 'disabled' : ''} class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2 rounded-xl text-sm">
+                            ${stockCount > 0 ? 'Comprar' : 'Agotado'}
+                        </button>
                     </div>
                 `;
             });
-
-            loadCurrentPrice();
         }
 
         function loadCurrentPrice() {
             const prodId = document.getElementById('price-product-id').value;
             const product = state.products.find(p => p.id === prodId);
-            if (product) {
-                document.getElementById('new-product-price').value = product.price;
-            }
+            if (product) document.getElementById('new-product-price').value = product.price;
         }
 
         function updateProductPrice() {
             const prodId = document.getElementById('price-product-id').value;
             const newPrice = parseFloat(document.getElementById('new-product-price').value);
-
-            if (!newPrice || newPrice <= 0) {
-                alert('Ingresa un precio válido.');
-                return;
-            }
-
             const product = state.products.find(p => p.id === prodId);
-            if (product) {
+            if (product && newPrice > 0) {
                 product.price = newPrice;
                 renderProducts();
-                alert(`El precio de "${product.name}" ha sido actualizado.`);
+                alert('Precio actualizado');
             }
         }
 
@@ -551,24 +434,15 @@
             const clabe = document.getElementById('admin-bank-clabe').value.trim();
             const holder = document.getElementById('admin-bank-holder').value.trim();
 
-            if (!bank || !clabe || !holder) {
-                alert('Por favor completa todos los campos bancarios.');
-                return;
-            }
-
             bankConfig = { bank, clabe, holder };
             await window.dbSet(window.dbRef(window.db, 'config/bank'), bankConfig);
-            alert('¡Datos bancarios actualizados con éxito en la nube!');
+            alert('Datos bancarios guardados en la nube');
         }
 
         function updateUI() {
             document.getElementById('display-bank-name').innerText = bankConfig.bank;
             document.getElementById('display-bank-clabe').innerText = bankConfig.clabe;
             document.getElementById('display-bank-holder').innerText = bankConfig.holder;
-            
-            document.getElementById('admin-bank-name').value = bankConfig.bank;
-            document.getElementById('admin-bank-clabe').value = bankConfig.clabe;
-            document.getElementById('admin-bank-holder').value = bankConfig.holder;
 
             if (!currentUser) return;
 
@@ -577,137 +451,65 @@
             document.getElementById('user-id-banner').innerText = currentUser.clientId;
             document.getElementById('modal-client-id').innerText = currentUser.clientId;
             document.getElementById('modal-client-id-concept').innerText = currentUser.clientId;
-            document.getElementById('user-balance').innerText = `$${currentUser.balance.toFixed(2)}`;
-            
-            const list = document.getElementById('purchases-list');
-            list.innerHTML = '';
-
-            if (!currentUser.purchases || currentUser.purchases.length === 0) {
-                list.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Aún no has realizado ninguna compra.</td></tr>`;
-                return;
-            }
-
-            currentUser.purchases.forEach(item => {
-                const codeLinkHtml = item.codeLink 
-                    ? `<br><a href="${item.codeLink}" target="_blank" class="inline-block mt-1 text-xs text-sky-400 underline hover:text-sky-300"><i class="fa-solid fa-external-link"></i> Abrir Panel de Códigos / Hogar</a>` 
-                    : '';
-
-                list.innerHTML += `
-                    <tr>
-                        <td class="p-3 font-medium text-purple-200">${item.productName}</td>
-                        <td class="p-3 font-mono text-xs text-indigo-300 bg-slate-950/60 rounded-lg">
-                            ${item.credentials}
-                            ${codeLinkHtml}
-                        </td>
-                        <td class="p-3 font-bold text-emerald-400">$${item.price.toFixed(2)}</td>
-                        <td class="p-3 text-slate-400 text-xs">
-                            Comprado: ${item.date}<br>
-                            <span class="text-amber-400 font-semibold">Vence: ${item.expireDate}</span>
-                        </td>
-                    </tr>
-                `;
-            });
+            document.getElementById('user-balance').innerText = `$${(currentUser.balance || 0).toFixed(2)}`;
         }
 
         async function buyProduct(productId) {
             const product = state.products.find(p => p.id === productId);
-
             if (currentUser.balance < product.price) {
-                alert('Saldo insuficiente. Por favor realiza una recarga.');
-                openTopUpModal();
+                alert('Saldo insuficiente.');
                 return;
             }
 
             const itemIndex = state.inventory.findIndex(i => i.productId === productId && i.status === 'available');
             if (itemIndex === -1) {
-                alert('Producto agotado por el momento.');
+                alert('Sin stock.');
                 return;
             }
 
             currentUser.balance -= product.price;
-
             const item = state.inventory[itemIndex];
             item.status = 'sold';
 
-            const expireDateObj = new Date();
-            expireDateObj.setDate(expireDateObj.getDate() + product.days);
-            const expireStr = expireDateObj.toLocaleDateString();
-
-            if (!currentUser.purchases) currentUser.purchases = [];
-
-            currentUser.purchases.unshift({
-                productName: product.name,
-                credentials: item.credentials,
-                codeLink: item.codeLink || '',
-                price: product.price,
-                date: new Date().toLocaleDateString(),
-                expireDate: expireStr
-            });
-
-            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}`), currentUser);
-            localStorage.setItem('logged_user', JSON.stringify(currentUser));
+            await window.dbSet(window.dbRef(window.db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
+            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}/balance`), currentUser.balance);
 
             updateUI();
             renderProducts();
-
-            let msg = `¡Compra Exitosa!\n\nCuenta: ${item.credentials}`;
-            if (item.codeLink) {
-                msg += `\nEnlace Panel de Códigos: ${item.codeLink}`;
-            }
-            msg += `\n\nFecha de Vencimiento: ${expireStr}`;
-
-            alert(msg);
+            alert(`¡Compra Exitosa!\nCuenta: ${item.credentials}`);
         }
 
         async function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
 
-            if (!targetClientId) {
-                alert('Ingresa el ID del cliente.');
+            if (!targetClientId || !amount || amount <= 0) {
+                alert('Ingresa un ID y un monto válidos.');
                 return;
             }
 
-            if (!amount || amount <= 0) {
-                alert('Ingresa un monto válido.');
-                return;
+            const clientRef = window.dbRef(window.db, `clients/${targetClientId}`);
+            const snapshot = await window.dbGet(clientRef);
+
+            let currentBalance = 0;
+            let username = null;
+
+            if (snapshot.exists()) {
+                const cData = snapshot.val();
+                currentBalance = parseFloat(cData.balance || 0);
+                username = cData.username;
             }
 
-            const usersRef = window.dbRef(window.db, 'users');
-            const snapshot = await window.dbGet(usersRef);
+            const newBalance = currentBalance + amount;
 
-            if (!snapshot.exists()) {
-                alert('No hay usuarios registrados en la base de datos.');
-                return;
-            }
+            await window.dbSet(window.dbRef(window.db, `clients/${targetClientId}/balance`), newBalance);
 
-            let foundUsername = null;
-            let userData = null;
-
-            snapshot.forEach((childSnapshot) => {
-                const uData = childSnapshot.val();
-                if (uData.clientId === targetClientId) {
-                    foundUsername = childSnapshot.key;
-                    userData = uData;
-                }
-            });
-
-            if (!foundUsername) {
-                alert('No se encontró ningún usuario con ese ID de cliente.');
-                return;
-            }
-
-            userData.balance += amount;
-            await window.dbSet(window.dbRef(window.db, `users/${foundUsername}`), userData);
-
-            if (currentUser && currentUser.username === foundUsername) {
-                currentUser = userData;
-                localStorage.setItem('logged_user', JSON.stringify(currentUser));
-                updateUI();
+            if (username) {
+                await window.dbSet(window.dbRef(window.db, `users/${username}/balance`), newBalance);
             }
 
             document.getElementById('add-credit-client-id').value = '';
-            alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente con ID ${targetClientId} en tiempo real.`);
+            alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente ${targetClientId}.`);
         }
 
         function addStock() {
@@ -715,42 +517,23 @@
             const creds = document.getElementById('stock-credentials').value.trim();
             const codeLink = document.getElementById('stock-code-link').value.trim();
 
-            if (!creds) {
-                alert('Escribe las credenciales de la cuenta.');
-                return;
-            }
+            if (!creds) return;
 
-            state.inventory.push({
-                id: Date.now(),
-                productId: prodId,
-                credentials: creds,
-                codeLink: codeLink,
-                status: 'available'
-            });
-
+            state.inventory.push({ id: Date.now(), productId: prodId, credentials: creds, codeLink: codeLink, status: 'available' });
             document.getElementById('stock-credentials').value = '';
-            document.getElementById('stock-code-link').value = '';
             renderProducts();
-            alert('Cuenta guardada con éxito en el stock.');
+            alert('Inventario actualizado');
         }
 
-        function openAdminModal() {
-            document.getElementById('admin-pin-input').value = '';
-            document.getElementById('admin-modal').classList.remove('hidden');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('admin-modal').classList.add('hidden');
-        }
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
         function verifyAdminPIN() {
-            const pin = document.getElementById('admin-pin-input').value;
-            if (pin === ADMIN_PIN) {
+            if (document.getElementById('admin-pin-input').value === ADMIN_PIN) {
                 closeAdminModal();
                 switchTab('admin');
             } else {
-                alert('Contraseña incorrecta.');
-                document.getElementById('admin-pin-input').value = '';
+                alert('Clave incorrecta');
             }
         }
 
@@ -760,7 +543,6 @@
         function switchTab(tab) {
             document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
             document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function initStore() {
