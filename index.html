@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Store - Cine & Premium</title>
+    <title>Streaming Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -54,7 +54,7 @@
                 <h1 class="text-3xl font-extrabold bg-gradient-to-r from-red-500 via-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center justify-center gap-2">
                     <i class="fa-solid fa-film text-red-500 animate-pulse"></i> Streaming Store
                 </h1>
-                <p class="text-xs text-slate-400">Tu portal de entretenimiento y cuentas premium</p>
+                <p class="text-xs text-slate-400">Inicia sesión o regístrate para acceder</p>
             </div>
 
             <div class="flex bg-black/50 p-1 rounded-xl border border-purple-900/50 text-xs font-bold">
@@ -138,7 +138,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <!-- Panel del Cliente: Mis Cuentas Compradas -->
+            <!-- Panel del Cliente -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
@@ -171,7 +171,7 @@
                 </button>
             </div>
 
-            <!-- Tarjetas de Métricas / Contadores del Administrador -->
+            <!-- Métricas Admin -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/40 flex items-center justify-between shadow-xl">
                     <div>
@@ -276,7 +276,7 @@
                 </div>
             </div>
 
-            <!-- Panel Admin: Historial Global de Cuentas Vendidas -->
+            <!-- Panel Admin: Historial Global -->
             <div class="bg-slate-900/80 rounded-2xl p-6 border border-amber-500/30 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-amber-400">
                     <i class="fa-solid fa-receipt"></i> Historial General de Cuentas Vendidas
@@ -366,7 +366,9 @@
             ]
         };
 
-        window.addEventListener('firebase-ready', () => {
+        function startApp() {
+            if (!window.db) return;
+
             window.dbOnValue(window.dbRef(window.db, 'config/bank'), (snapshot) => {
                 if (snapshot.exists()) {
                     bankConfig = snapshot.val();
@@ -385,7 +387,6 @@
                 });
             }
 
-            // Escuchar todas las ventas para el Panel de Administrador y calcular Métrica de Ventas
             window.dbOnValue(window.dbRef(window.db, 'sales'), (snapshot) => {
                 const salesListAdmin = document.getElementById('admin-sales-list');
                 const totalRevenueEl = document.getElementById('admin-total-revenue');
@@ -406,7 +407,8 @@
                                 <tr>
                                     <td class="p-3 font-mono text-purple-300">${sale.clientId} <br><span class="text-xs text-slate-400">(${sale.username})</span></td>
                                     <td class="p-3 font-bold text-white">${sale.productName}</td>
-                                    <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${sale.credentials}</td> <td class="p-3 font-bold text-emerald-400">$${parseFloat(sale.price).toFixed(2)}</td>
+                                    <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${sale.credentials}</td>
+                                    <td class="p-3 font-bold text-emerald-400">$${parseFloat(sale.price).toFixed(2)}</td>
                                     <td class="p-3 text-xs text-slate-300">${sale.date}</td>
                                     <td class="p-3 text-xs text-amber-400 font-semibold">${sale.expireDate}</td>
                                 </tr>
@@ -423,7 +425,12 @@
                     }
                 }
             });
-        });
+
+            initStore();
+        }
+
+        window.addEventListener('firebase-ready', startApp);
+        if (window.db) startApp();
 
         function switchAuthTab(tab) {
             document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
@@ -491,7 +498,7 @@
 
         function reportAccountIssue(productName, credentials) {
             if (!currentUser) return;
-            const msg = `Hola, necesito soporte técnico con mi cuenta.\n\n*Servicio:* ${productName}\n*Credenciales:*${credentials}\n*ID de Cliente:* ${currentUser.clientId}\n*Usuario:*${currentUser.username}\n\nLa cuenta presenta una caída/falla. ¿Me podrías ayudar a revisarla?`;
+            const msg = `Hola, necesito soporte técnico con mi cuenta.\n\n*Servicio:* ${productName}\n*Credenciales:* ${credentials}\n*ID de Cliente:* ${currentUser.clientId}\n*Usuario:* ${currentUser.username}\n\nLa cuenta presenta una caída/falla. ¿Me podrías ayudar a revisarla?`;
             window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -522,7 +529,10 @@
                         <div class="p-5 space-y-4 flex-1 flex flex-col justify-between">
                             <div>
                                 <h3 class="font-bold text-lg text-white">${prod.name}</h3>
-                                <p class="text-xs text-slate-400 mt-1">Duración: ${prod.days} días</p> </div> <div class="flex justify-between items-center pt-2"> <span class="text-xl font-extrabold text-pink-400">$${prod.price.toFixed(2)} <span class="text-xs text-slate-400">MXN</span></span>
+                                <p class="text-xs text-slate-400 mt-1">Duración: ${prod.days} días</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="text-xl font-extrabold text-pink-400">$${prod.price.toFixed(2)} <span class="text-xs text-slate-400">MXN</span></span>
                             </div>
                             <button type="button" onclick="buyProduct('${prod.id}')" 
                                 ${stockCount === 0 ? 'disabled' : ''} 
@@ -606,4 +616,142 @@
                         purchasesList.innerHTML += `
                             <tr>
                                 <td class="p-3 font-medium text-purple-200">${item.productName}</td>
-                                <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${item.credentials
+                                <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${item.credentials}</td>
+                                <td class="p-3 font-bold text-emerald-400">$${item.price.toFixed(2)}</td>
+                                <td class="p-3 text-slate-400 text-xs">Comprado: ${item.date}<br><span class="text-amber-400 font-semibold">Vence: ${item.expireDate}</span></td>
+                                <td class="p-3 space-y-1">
+                                    <div>${statusBadge}</div>
+                                    <button type="button" onclick="reportAccountIssue('${item.productName}', '${item.credentials}')" class="text-xs bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg transition font-bold flex items-center gap-1 mt-1">
+                                        <i class="fa-brands fa-whatsapp"></i> Soporte
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+        }
+
+        async function buyProduct(productId) {
+            const product = state.products.find(p => p.id === productId);
+            if (currentUser.balance < product.price) {
+                alert('Saldo insuficiente.');
+                return;
+            }
+
+            const itemIndex = state.inventory.findIndex(i => i.productId === productId && i.status === 'available');
+            if (itemIndex === -1) {
+                alert('Sin stock.');
+                return;
+            }
+
+            currentUser.balance -= product.price;
+            const item = state.inventory[itemIndex];
+            item.status = 'sold';
+
+            const expireDateObj = new Date();
+            expireDateObj.setDate(expireDateObj.getDate() + product.days);
+
+            const newPurchase = {
+                productName: product.name,
+                credentials: item.credentials,
+                price: product.price,
+                date: new Date().toLocaleDateString(),
+                expireDate: expireDateObj.toLocaleDateString(),
+                expireDateRaw: expireDateObj.toISOString(),
+                clientId: currentUser.clientId,
+                username: currentUser.username
+            };
+
+            if (!currentUser.purchases) currentUser.purchases = [];
+            currentUser.purchases.unshift(newPurchase);
+
+            await window.dbSet(window.dbRef(window.db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
+            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}`), currentUser);
+
+            const newSaleKey = Date.now();
+            await window.dbSet(window.dbRef(window.db, `sales/${newSaleKey}`), newPurchase);
+
+            updateUI();
+            renderProducts();
+            alert(`¡Compra Exitosa!\nCuenta: ${item.credentials}`);
+        }
+
+        async function addCreditByClientID() {
+            const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
+            const amount = parseFloat(document.getElementById('add-credit-amount').value);
+
+            if (!targetClientId || !amount || amount <= 0) {
+                alert('Ingresa un ID y un monto válidos.');
+                return;
+            }
+
+            const clientRef = window.dbRef(window.db, `clients/${targetClientId}`);
+            const snapshot = await window.dbGet(clientRef);
+
+            let currentBalance = 0;
+            let username = null;
+
+            if (snapshot.exists()) {
+                const cData = snapshot.val();
+                currentBalance = parseFloat(cData.balance || 0);
+                username = cData.username;
+            }
+
+            const newBalance = currentBalance + amount;
+
+            await window.dbSet(window.dbRef(window.db, `clients/${targetClientId}/balance`), newBalance);
+
+            if (username) {
+                await window.dbSet(window.dbRef(window.db, `users/${username}/balance`), newBalance);
+            }
+
+            document.getElementById('add-credit-client-id').value = '';
+            alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente ${targetClientId}.`);
+        }
+
+        function addStock() {
+            const prodId = document.getElementById('stock-product-id').value;
+            const creds = document.getElementById('stock-credentials').value.trim();
+            const codeLink = document.getElementById('stock-code-link').value.trim();
+
+            if (!creds) return;
+
+            state.inventory.push({ id: Date.now(), productId: prodId, credentials: creds, codeLink: codeLink, status: 'available' });
+            document.getElementById('stock-credentials').value = '';
+            renderProducts();
+            alert('Inventario actualizado');
+        }
+
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+        function verifyAdminPIN() {
+            if (document.getElementById('admin-pin-input').value === ADMIN_PIN) {
+                closeAdminModal();
+                switchTab('admin');
+            } else {
+                alert('Clave incorrecta');
+            }
+        }
+
+        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
+
+        function switchTab(tab) {
+            document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
+            document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
+        }
+
+        function initStore() {
+            if (currentUser) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                renderProducts();
+                updateUI();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
