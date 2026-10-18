@@ -144,15 +144,20 @@
                 </button>
             </div>
 
-            <!-- Métricas Admin -->
+            <!-- Métricas Admin con Botón de Reiniciar/Borrar Contador -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/40 flex items-center justify-between shadow-xl">
                     <div>
                         <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Ingresos por Ventas</p>
                         <h4 id="admin-total-revenue" class="text-3xl font-extrabold text-emerald-400 mt-1">$0.00 MXN</h4>
                     </div>
-                    <div class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl border border-emerald-500/30">
-                        <i class="fa-solid fa-sack-dollar text-3xl"></i>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="resetSalesCounter()" title="Borrar contador e historial" class="bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 border border-rose-500/30 p-3 rounded-2xl transition">
+                            <i class="fa-solid fa-trash-can text-lg"></i>
+                        </button>
+                        <div class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl border border-emerald-500/30">
+                            <i class="fa-solid fa-sack-dollar text-3xl"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -443,6 +448,17 @@
             window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
+        window.resetSalesCounter = async function() {
+            if (confirm('¿Estás seguro de que deseas borrar el contador e historial de ventas?')) {
+                try {
+                    await set(ref(db, 'sales'), null);
+                    alert('Contador de ventas reiniciado con éxito.');
+                } catch (err) {
+                    alert('Error al reiniciar el contador: ' + err.message);
+                }
+            }
+        };
+
         function renderProducts() {
             const container = document.getElementById('products-grid');
             const selectAdmin = document.getElementById('stock-product-id');
@@ -704,3 +720,45 @@
         });
 
         onValue(ref(db, 'sales'), (snapshot) => {
+            const salesListAdmin = document.getElementById('admin-sales-list');
+            const totalRevenueEl = document.getElementById('admin-total-revenue');
+            const totalCountEl = document.getElementById('admin-total-count');
+
+            if (salesListAdmin) {
+                salesListAdmin.innerHTML = '';
+                if (snapshot.exists()) {
+                    const salesObj = snapshot.val();
+                    const salesArr = Object.values(salesObj);
+
+                    let totalRevenue = 0;
+                    let totalCount = salesArr.length;
+
+                    salesArr.reverse().forEach(sale => {
+                        totalRevenue += parseFloat(sale.price || 0);
+                        salesListAdmin.innerHTML += `
+                            <tr>
+                                <td class="p-3 font-mono text-purple-300">${sale.clientId} <br><span class="text-xs text-slate-400">(${sale.username})</span></td>
+                                <td class="p-3 font-bold text-white">${sale.productName}</td>
+                                <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${sale.credentials}</td>
+                                <td class="p-3 font-bold text-emerald-400">$${parseFloat(sale.price).toFixed(2)}</td>
+                                <td class="p-3 text-xs text-slate-300">${sale.date}</td>
+                                <td class="p-3 text-xs text-amber-400 font-semibold">${sale.expireDate}</td>
+                            </tr>
+                        `;
+                    });
+
+                    if (totalRevenueEl) totalRevenueEl.innerText = `$${totalRevenue.toFixed(2)} MXN`;
+                    if (totalCountEl) totalCountEl.innerText = `${totalCount} Cuenta(s)`;
+
+                } else {
+                    salesListAdmin.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Aún no hay ventas registradas.</td></tr>`;
+                    if (totalRevenueEl) totalRevenueEl.innerText = `$0.00 MXN`;
+                    if (totalCountEl) totalCountEl.innerText = `0 Cuentas`;
+                }
+            }
+        });
+
+        initStore();
+    </script>
+</body>
+</html>
