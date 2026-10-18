@@ -6,33 +6,6 @@
     <title>Streaming Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- SDK Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyDha0rM7tpYgfP8_pSBtwlF1k1QQVRn50k",
-          authDomain: "tienda-streaming-c1b24.firebaseapp.com",
-          databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com",
-          projectId: "tienda-streaming-c1b24",
-          storageBucket: "tienda-streaming-c1b24.firebasestorage.app",
-          messagingSenderId: "876184417584",
-          appId: "1:876184417584:web:1db078857a90bf10ee44f5"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        window.db = db;
-        window.dbRef = ref;
-        window.dbSet = set;
-        window.dbGet = get;
-        window.dbOnValue = onValue;
-
-        window.dispatchEvent(new Event('firebase-ready'));
-    </script>
     <style>
         body {
             background: radial-gradient(circle at top, #1e1035 0%, #090514 100%);
@@ -138,7 +111,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <!-- Panel del Cliente -->
+            <!-- Panel Cliente -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
@@ -336,7 +309,30 @@
         </div>
     </div>
 
-    <script>
+    <!-- Script Principal con Firebase integrado -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDha0rM7tpYgfP8_pSBtwlF1k1QQVRn50k",
+          authDomain: "tienda-streaming-c1b24.firebaseapp.com",
+          databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com",
+          projectId: "tienda-streaming-c1b24",
+          storageBucket: "tienda-streaming-c1b24.firebasestorage.app",
+          messagingSenderId: "876184417584",
+          appId: "1:876184417584:web:1db078857a90bf10ee44f5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbGet = get;
+        window.dbOnValue = onValue;
+
         const ADMIN_PIN = "199720022019";
         const ADMIN_PHONE = "9241955327";
 
@@ -366,147 +362,93 @@
             ]
         };
 
-        function startApp() {
-            if (!window.db) return;
-
-            window.dbOnValue(window.dbRef(window.db, 'config/bank'), (snapshot) => {
-                if (snapshot.exists()) {
-                    bankConfig = snapshot.val();
-                    updateUI();
-                }
-            });
-
-            if (currentUser && currentUser.clientId) {
-                window.dbOnValue(window.dbRef(window.db, `clients/${currentUser.clientId}`), (snapshot) => {
-                    if (snapshot.exists()) {
-                        const cloudData = snapshot.val();
-                        currentUser.balance = parseFloat(cloudData.balance || 0);
-                        localStorage.setItem('logged_user', JSON.stringify(currentUser));
-                        updateUI();
-                    }
-                });
-            }
-
-            window.dbOnValue(window.dbRef(window.db, 'sales'), (snapshot) => {
-                const salesListAdmin = document.getElementById('admin-sales-list');
-                const totalRevenueEl = document.getElementById('admin-total-revenue');
-                const totalCountEl = document.getElementById('admin-total-count');
-
-                if (salesListAdmin) {
-                    salesListAdmin.innerHTML = '';
-                    if (snapshot.exists()) {
-                        const salesObj = snapshot.val();
-                        const salesArr = Object.values(salesObj);
-
-                        let totalRevenue = 0;
-                        let totalCount = salesArr.length;
-
-                        salesArr.reverse().forEach(sale => {
-                            totalRevenue += parseFloat(sale.price || 0);
-                            salesListAdmin.innerHTML += `
-                                <tr>
-                                    <td class="p-3 font-mono text-purple-300">${sale.clientId} <br><span class="text-xs text-slate-400">(${sale.username})</span></td>
-                                    <td class="p-3 font-bold text-white">${sale.productName}</td>
-                                    <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${sale.credentials}</td>
-                                    <td class="p-3 font-bold text-emerald-400">$${parseFloat(sale.price).toFixed(2)}</td>
-                                    <td class="p-3 text-xs text-slate-300">${sale.date}</td>
-                                    <td class="p-3 text-xs text-amber-400 font-semibold">${sale.expireDate}</td>
-                                </tr>
-                            `;
-                        });
-
-                        if (totalRevenueEl) totalRevenueEl.innerText = `$${totalRevenue.toFixed(2)} MXN`;
-                        if (totalCountEl) totalCountEl.innerText = `${totalCount} Cuenta(s)`;
-
-                    } else {
-                        salesListAdmin.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Aún no hay ventas registradas.</td></tr>`;
-                        if (totalRevenueEl) totalRevenueEl.innerText = `$0.00 MXN`;
-                        if (totalCountEl) totalCountEl.innerText = `0 Cuentas`;
-                    }
-                }
-            });
-
-            initStore();
-        }
-
-        window.addEventListener('firebase-ready', startApp);
-        if (window.db) startApp();
-
-        function switchAuthTab(tab) {
+        window.switchAuthTab = function(tab) {
             document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
             document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
-        }
+            document.getElementById('btn-tab-login').className = tab === 'login' ? 'flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg' : 'flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition';
+            document.getElementById('btn-tab-register').className = tab === 'register' ? 'flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg' : 'flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition';
+        };
 
-        async function handleRegister(e) {
+        window.handleRegister = async function(e) {
             e.preventDefault();
             const name = document.getElementById('reg-fullname').value.trim();
             const username = document.getElementById('reg-username').value.trim().toLowerCase();
             const password = document.getElementById('reg-password').value;
 
-            const userRef = window.dbRef(window.db, `users/${username}`);
-            const snapshot = await window.dbGet(userRef);
+            try {
+                const userRef = ref(db, `users/${username}`);
+                const snapshot = await get(userRef);
 
-            if (snapshot.exists()) {
-                alert('Ese usuario ya existe.');
-                return;
+                if (snapshot.exists()) {
+                    alert('Ese usuario ya existe.');
+                    return;
+                }
+
+                const clientId = 'CLI-' + Math.floor(100000 + Math.random() * 900000);
+                const newUser = { name, username, password, clientId, balance: 0.00, purchases: [] };
+
+                await set(userRef, newUser);
+                await set(ref(db, `clients/${clientId}`), { username, balance: 0.00 });
+
+                currentUser = newUser;
+                localStorage.setItem('logged_user', JSON.stringify(currentUser));
+                initStore();
+            } catch (err) {
+                alert('Error al registrar usuario: ' + err.message);
             }
+        };
 
-            const clientId = 'CLI-' + Math.floor(100000 + Math.random() * 900000);
-            const newUser = { name, username, password, clientId, balance: 0.00, purchases: [] };
-
-            await window.dbSet(userRef, newUser);
-            await window.dbSet(window.dbRef(window.db, `clients/${clientId}`), { username, balance: 0.00 });
-
-            currentUser = newUser;
-            localStorage.setItem('logged_user', JSON.stringify(currentUser));
-            location.reload();
-        }
-
-        async function handleLogin(e) {
+        window.handleLogin = async function(e) {
             e.preventDefault();
             const username = document.getElementById('login-username').value.trim().toLowerCase();
             const password = document.getElementById('login-password').value;
 
-            const snapshot = await window.dbGet(window.dbRef(window.db, `users/${username}`));
+            try {
+                const snapshot = await get(ref(db, `users/${username}`));
 
-            if (!snapshot.exists() || snapshot.val().password !== password) {
-                alert('Usuario o contraseña incorrectos.');
-                return;
+                if (!snapshot.exists() || snapshot.val().password !== password) {
+                    alert('Usuario o contraseña incorrectos.');
+                    return;
+                }
+
+                currentUser = snapshot.val();
+                localStorage.setItem('logged_user', JSON.stringify(currentUser));
+                initStore();
+            } catch (err) {
+                alert('Error al iniciar sesión: ' + err.message);
             }
+        };
 
-            currentUser = snapshot.val();
-            localStorage.setItem('logged_user', JSON.stringify(currentUser));
-            location.reload();
-        }
-
-        function logout() {
+        window.logout = function() {
             localStorage.removeItem('logged_user');
+            currentUser = null;
             location.reload();
-        }
+        };
 
-        function copyClientID() {
+        window.copyClientID = function() {
             if (!currentUser) return;
             navigator.clipboard.writeText(currentUser.clientId);
             alert(`ID copiado: ${currentUser.clientId}`);
-        }
+        };
 
-        function sendWhatsAppProof() {
+        window.sendWhatsAppProof = function() {
             if (!currentUser) return;
             const message = `Hola, recargué mi cuenta.\nMi ID de cliente es: *${currentUser.clientId}*\nNombre: *${currentUser.name}*`;
             window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
-        }
+        };
 
-        function reportAccountIssue(productName, credentials) {
+        window.reportAccountIssue = function(productName, credentials) {
             if (!currentUser) return;
             const msg = `Hola, necesito soporte técnico con mi cuenta.\n\n*Servicio:* ${productName}\n*Credenciales:* ${credentials}\n*ID de Cliente:* ${currentUser.clientId}\n*Usuario:* ${currentUser.username}\n\nLa cuenta presenta una caída/falla. ¿Me podrías ayudar a revisarla?`;
             window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
+        };
 
         function renderProducts() {
             const container = document.getElementById('products-grid');
             const selectAdmin = document.getElementById('stock-product-id');
             const selectPrice = document.getElementById('price-product-id');
             
+            if (!container) return;
             container.innerHTML = '';
             selectAdmin.innerHTML = '';
             selectPrice.innerHTML = '';
@@ -551,13 +493,13 @@
             loadCurrentPrice();
         }
 
-        function loadCurrentPrice() {
+        window.loadCurrentPrice = function() {
             const prodId = document.getElementById('price-product-id').value;
             const product = state.products.find(p => p.id === prodId);
             if (product) document.getElementById('new-product-price').value = product.price;
-        }
+        };
 
-        function updateProductPrice() {
+        window.updateProductPrice = function() {
             const prodId = document.getElementById('price-product-id').value;
             const newPrice = parseFloat(document.getElementById('new-product-price').value);
             const product = state.products.find(p => p.id === prodId);
@@ -566,22 +508,22 @@
                 renderProducts();
                 alert('Precio actualizado');
             }
-        }
+        };
 
-        async function updateBankInfo() {
+        window.updateBankInfo = async function() {
             const bank = document.getElementById('admin-bank-name').value.trim();
             const clabe = document.getElementById('admin-bank-clabe').value.trim();
             const holder = document.getElementById('admin-bank-holder').value.trim();
 
             bankConfig = { bank, clabe, holder };
-            await window.dbSet(window.dbRef(window.db, 'config/bank'), bankConfig);
+            await set(ref(db, 'config/bank'), bankConfig);
             alert('Datos bancarios guardados en la nube');
-        }
+        };
 
         function updateUI() {
-            document.getElementById('display-bank-name').innerText = bankConfig.bank;
-            document.getElementById('display-bank-clabe').innerText = bankConfig.clabe;
-            document.getElementById('display-bank-holder').innerText = bankConfig.holder;
+            document.getElementById('display-bank-name').innerText = bankConfig.bank || '--';
+            document.getElementById('display-bank-clabe').innerText = bankConfig.clabe || '--';
+            document.getElementById('display-bank-holder').innerText = bankConfig.holder || '--';
 
             if (!currentUser) return;
 
@@ -632,7 +574,7 @@
             }
         }
 
-        async function buyProduct(productId) {
+        window.buyProduct = async function(productId) {
             const product = state.products.find(p => p.id === productId);
             if (currentUser.balance < product.price) {
                 alert('Saldo insuficiente.');
@@ -666,18 +608,18 @@
             if (!currentUser.purchases) currentUser.purchases = [];
             currentUser.purchases.unshift(newPurchase);
 
-            await window.dbSet(window.dbRef(window.db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
-            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}`), currentUser);
+            await set(ref(db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
+            await set(ref(db, `users/${currentUser.username}`), currentUser);
 
             const newSaleKey = Date.now();
-            await window.dbSet(window.dbRef(window.db, `sales/${newSaleKey}`), newPurchase);
+            await set(ref(db, `sales/${newSaleKey}`), newPurchase);
 
             updateUI();
             renderProducts();
             alert(`¡Compra Exitosa!\nCuenta: ${item.credentials}`);
-        }
+        };
 
-        async function addCreditByClientID() {
+        window.addCreditByClientID = async function() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
 
@@ -686,8 +628,8 @@
                 return;
             }
 
-            const clientRef = window.dbRef(window.db, `clients/${targetClientId}`);
-            const snapshot = await window.dbGet(clientRef);
+            const clientRef = ref(db, `clients/${targetClientId}`);
+            const snapshot = await get(clientRef);
 
             let currentBalance = 0;
             let username = null;
@@ -700,17 +642,17 @@
 
             const newBalance = currentBalance + amount;
 
-            await window.dbSet(window.dbRef(window.db, `clients/${targetClientId}/balance`), newBalance);
+            await set(ref(db, `clients/${targetClientId}/balance`), newBalance);
 
             if (username) {
-                await window.dbSet(window.dbRef(window.db, `users/${username}/balance`), newBalance);
+                await set(ref(db, `users/${username}/balance`), newBalance);
             }
 
             document.getElementById('add-credit-client-id').value = '';
             alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente ${targetClientId}.`);
-        }
+        };
 
-        function addStock() {
+        window.addStock = function() {
             const prodId = document.getElementById('stock-product-id').value;
             const creds = document.getElementById('stock-credentials').value.trim();
             const codeLink = document.getElementById('stock-code-link').value.trim();
@@ -721,27 +663,27 @@
             document.getElementById('stock-credentials').value = '';
             renderProducts();
             alert('Inventario actualizado');
-        }
+        };
 
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+        window.openAdminModal = function() { document.getElementById('admin-modal').classList.remove('hidden'); };
+        window.closeAdminModal = function() { document.getElementById('admin-modal').classList.add('hidden'); };
 
-        function verifyAdminPIN() {
+        window.verifyAdminPIN = function() {
             if (document.getElementById('admin-pin-input').value === ADMIN_PIN) {
                 closeAdminModal();
                 switchTab('admin');
             } else {
                 alert('Clave incorrecta');
             }
-        }
+        };
 
-        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
-        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
+        window.openTopUpModal = function() { document.getElementById('topup-modal').classList.remove('hidden'); };
+        window.closeTopUpModal = function() { document.getElementById('topup-modal').classList.add('hidden'); };
 
-        function switchTab(tab) {
+        window.switchTab = function(tab) {
             document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
             document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
-        }
+        };
 
         function initStore() {
             if (currentUser) {
@@ -752,6 +694,13 @@
                 document.getElementById('auth-screen').classList.remove('hidden');
             }
         }
-    </script>
-</body>
-</html>
+
+        // Cargar datos en tiempo real
+        onValue(ref(db, 'config/bank'), (snapshot) => {
+            if (snapshot.exists()) {
+                bankConfig = snapshot.val();
+                updateUI();
+            }
+        });
+
+        onValue(ref(db, 'sales'), (snapshot) => {
