@@ -626,13 +626,15 @@
             let users = JSON.parse(localStorage.getItem('app_users') || '{}');
             let userFoundKey = Object.keys(users).find(k => users[k].clientId === targetClientId);
 
-            if (!userFoundKey) {
-                alert('No se encontró ningún cliente registrado con ese ID.');
-                return;
+            if (userFoundKey) {
+                users[userFoundKey].balance += amount;
+                localStorage.setItem('app_users', JSON.stringify(users));
+            } else {
+                // Si el usuario no existe aún en el dispositivo admin, guardar el saldo vinculado al ID
+                let externalBalances = JSON.parse(localStorage.getItem('external_balances') || '{}');
+                externalBalances[targetClientId] = (externalBalances[targetClientId] || 0) + amount;
+                localStorage.setItem('external_balances', JSON.stringify(externalBalances));
             }
-
-            users[userFoundKey].balance += amount;
-            localStorage.setItem('app_users', JSON.stringify(users));
 
             if (currentUser && currentUser.clientId === targetClientId) {
                 currentUser.balance += amount;
@@ -699,6 +701,21 @@
 
         function initStore() {
             if (currentUser) {
+                // Comprobar si hay saldo pendiente acreditado por el admin para este ID
+                let externalBalances = JSON.parse(localStorage.getItem('external_balances') || '{}');
+                if (externalBalances[currentUser.clientId]) {
+                    currentUser.balance += externalBalances[currentUser.clientId];
+                    delete externalBalances[currentUser.clientId];
+                    localStorage.setItem('external_balances', JSON.stringify(externalBalances));
+                    
+                    let users = JSON.parse(localStorage.getItem('app_users') || '{}');
+                    if (users[currentUser.username]) {
+                        users[currentUser.username].balance = currentUser.balance;
+                        localStorage.setItem('app_users', JSON.stringify(users));
+                    }
+                    localStorage.setItem('logged_user', JSON.stringify(currentUser));
+                }
+
                 document.getElementById('auth-screen').classList.add('hidden');
                 renderProducts();
                 updateUI();
