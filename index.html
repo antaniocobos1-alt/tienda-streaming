@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda de Cuentas Streaming</title>
+    <title>Streaming Store - Cine & Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -33,34 +33,45 @@
 
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
+    <style>
+        body {
+            background: radial-gradient(circle at top, #1e1035 0%, #090514 100%);
+        }
+        .glow-card {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+        }
+        .glow-card:hover {
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-purple-500 selection:text-white">
+<body class="text-slate-100 min-h-screen font-sans selection:bg-pink-500 selection:text-white">
 
     <!-- Pantalla Auth -->
-    <div id="auth-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-purple-900/40 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl">
+    <div id="auth-screen" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900/90 border border-purple-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl glow-card">
             <div class="text-center space-y-2">
-                <h1 class="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play-circle text-purple-400"></i> Streaming Store
+                <h1 class="text-3xl font-extrabold bg-gradient-to-r from-red-500 via-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-film text-red-500 animate-pulse"></i> Streaming Store
                 </h1>
-                <p class="text-xs text-slate-400">Inicia sesión o regístrate para acceder</p>
+                <p class="text-xs text-slate-400">Tu portal de entretenimiento y cuentas premium</p>
             </div>
 
-            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
-                <button type="button" id="btn-tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-purple-600 text-white transition">Iniciar Sesión</button>
-                <button type="button" id="btn-tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition">Registrarse</button>
+            <div class="flex bg-black/50 p-1 rounded-xl border border-purple-900/50 text-xs font-bold">
+                <button type="button" id="btn-tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg">Iniciar Sesión</button>
+                <button type="button" id="btn-tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition">Registrarse</button>
             </div>
 
             <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="text-xs text-slate-400">Usuario</label>
-                    <input type="text" id="login-username" required placeholder="Tu usuario" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                    <input type="text" id="login-username" required placeholder="Tu usuario" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Contraseña</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
+                <button type="submit" class="w-full bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 hover:opacity-90 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
                     Ingresar a la Tienda
                 </button>
             </form>
@@ -68,17 +79,17 @@
             <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-4">
                 <div>
                     <label class="text-xs text-slate-400">Nombre Completo</label>
-                    <input type="text" id="reg-fullname" required placeholder="Juan Pérez" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                    <input type="text" id="reg-fullname" required placeholder="Juan Pérez" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Nombre de Usuario</label>
-                    <input type="text" id="reg-username" required placeholder="juanperez123" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                    <input type="text" id="reg-username" required placeholder="juanperez123" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Contraseña</label>
-                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-purple-500">
+                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-teal-600/30">
                     Crear Cuenta e Ingresar
                 </button>
             </form>
@@ -86,26 +97,26 @@
     </div>
 
     <!-- Navegación -->
-    <nav class="bg-slate-900/90 backdrop-blur-md border-b border-purple-900/40 p-4 sticky top-0 z-40">
+    <nav class="bg-slate-950/80 backdrop-blur-xl border-b border-purple-900/30 p-4 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
-            <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
-                <i class="fa-solid fa-play-circle text-purple-400"></i> Streaming Store
+            <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-red-500 via-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
+                <i class="fa-solid fa-clapperboard text-red-500"></i> Streaming Store
             </h1>
             <div class="flex items-center gap-2 sm:gap-3">
-                <div class="bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-purple-500/30 text-xs flex items-center gap-1.5">
+                <div class="bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-500/30 text-xs flex items-center gap-1.5">
                     <span class="text-slate-400 hidden sm:inline">Mi ID:</span>
-                    <span id="user-client-id" class="text-purple-300 font-mono font-bold">CLI-0000</span>
+                    <span id="user-client-id" class="text-pink-400 font-mono font-bold">CLI-0000</span>
                     <button type="button" onclick="copyClientID()" class="text-slate-400 hover:text-white transition ml-1" title="Copiar ID">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <div class="bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-emerald-500/30 text-xs sm:text-sm">
-                    Saldo: <span id="user-balance" class="text-emerald-400 font-bold">$0.00</span> MXN
+                <div class="bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-500/40 text-xs sm:text-sm font-bold text-emerald-400">
+                    Saldo: <span id="user-balance" class="text-emerald-300">$0.00</span> MXN
                 </div>
-                <button type="button" onclick="openAdminModal()" class="text-xs bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-3 py-2 rounded-xl transition shadow-lg shadow-amber-500/20">
+                <button type="button" onclick="openAdminModal()" class="text-xs bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 text-white font-bold px-3 py-2 rounded-xl transition shadow-lg shadow-amber-500/20">
                     <i class="fa-solid fa-lock"></i> Admin
                 </button>
-                <button type="button" onclick="logout()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold p-2 rounded-xl transition" title="Cerrar Sesión">
+                <button type="button" onclick="logout()" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold p-2 rounded-xl transition border border-slate-800" title="Cerrar Sesión">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
@@ -117,32 +128,33 @@
         <section id="tab-shop" class="space-y-6">
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <div>
-                    <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-purple-400">Cliente</span> 👋</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Tu ID único de recarga es: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
+                    <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 🍿</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Tu ID de recarga: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
                 </div>
-                <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
+                <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 hover:opacity-90 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
                     <i class="fa-solid fa-wallet"></i> Recargar Saldo
                 </button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <div class="bg-slate-900/80 rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
-                <h3 class="text-lg font-bold flex items-center gap-2 text-purple-300">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Mis Cuentas Compradas
+            <!-- Panel del Cliente: Mis Cuentas Compradas -->
+            <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
+                    <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-950 text-slate-400">
                             <tr>
                                 <th class="p-3">Servicio</th>
-                                <th class="p-3">Credenciales / Panel</th>
+                                <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
-                                <th class="p-3">Fecha y Vencimiento</th>
-                                <th class="p-3">Estado</th>
+                                <th class="p-3">Vencimiento</th>
+                                <th class="p-3">Estado / Soporte</th>
                             </tr>
                         </thead>
-                        <tbody id="purchases-list" class="divide-y divide-slate-800"></tbody>
+                        <tbody id="purchases-list" class="divide-y divide-purple-950/50"></tbody>
                     </table>
                 </div>
             </div>
@@ -150,7 +162,7 @@
 
         <!-- Panel Admin -->
         <section id="tab-admin" class="hidden space-y-6">
-            <div class="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-amber-500/30 shadow-xl">
+            <div class="flex justify-between items-center bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30 shadow-xl">
                 <h2 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
                     <i class="fa-solid fa-user-shield"></i> Panel Administrador
                 </h2>
@@ -159,9 +171,32 @@
                 </button>
             </div>
 
+            <!-- Tarjetas de Métricas / Contadores del Administrador -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/40 flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Ingresos por Ventas</p>
+                        <h4 id="admin-total-revenue" class="text-3xl font-extrabold text-emerald-400 mt-1">$0.00 MXN</h4>
+                    </div>
+                    <div class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl border border-emerald-500/30">
+                        <i class="fa-solid fa-sack-dollar text-3xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 p-5 rounded-2xl border border-pink-500/40 flex items-center justify-between shadow-xl">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Cuentas Vendidas</p>
+                        <h4 id="admin-total-count" class="text-3xl font-extrabold text-pink-400 mt-1">0 Cuentas</h4>
+                    </div>
+                    <div class="bg-pink-500/20 text-pink-400 p-4 rounded-2xl border border-pink-500/30">
+                        <i class="fa-solid fa-chart-line text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Datos Bancarios -->
-                <div class="bg-slate-900 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
                         <i class="fa-solid fa-building-columns"></i> Datos Bancarios
                     </h3>
@@ -183,7 +218,7 @@
                 </div>
 
                 <!-- Modificar Precios -->
-                <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
                         <i class="fa-solid fa-tags"></i> Precios
                     </h3>
@@ -201,7 +236,7 @@
                 </div>
 
                 <!-- Recargar por ID -->
-                <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus"></i> Recargar ID
                     </h3>
@@ -219,8 +254,8 @@
                 </div>
 
                 <!-- Cargar Stock -->
-                <div class="bg-slate-900 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-purple-400 flex items-center gap-2">
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
                         <i class="fa-solid fa-box-archive"></i> Inventario
                     </h3>
                     <div class="space-y-3">
@@ -236,15 +271,39 @@
                             <label class="text-xs text-slate-400">Link Panel (Opcional)</label>
                             <input type="text" id="stock-code-link" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="addStock()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
+                        <button type="button" onclick="addStock()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Panel Admin: Historial Global de Cuentas Vendidas -->
+            <div class="bg-slate-900/80 rounded-2xl p-6 border border-amber-500/30 space-y-4 shadow-xl">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-amber-400">
+                    <i class="fa-solid fa-receipt"></i> Historial General de Cuentas Vendidas
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950 text-slate-400">
+                            <tr>
+                                <th class="p-3">Cliente / ID</th>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">Credenciales</th>
+                                <th class="p-3">Precio</th>
+                                <th class="p-3">Fecha Compra</th>
+                                <th class="p-3">Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-sales-list" class="divide-y divide-slate-800">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Cargando ventas...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Modal Admin -->
-    <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
+    <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
             <h3 class="text-lg font-bold text-amber-400">Acceso Administrador</h3>
             <input type="password" id="admin-pin-input" placeholder="••••••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-lg text-white">
@@ -256,16 +315,16 @@
     </div>
 
     <!-- Modal Recarga -->
-    <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
+    <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-purple-400">Cómo recargar saldo</h3>
-            <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 border border-slate-800">
-                <p class="text-purple-300 font-bold">Tu ID: <span id="modal-client-id" class="font-mono text-emerald-400">CLI-0000</span></p>
-                <div class="border-t border-slate-800 pt-2 font-mono text-xs text-slate-300 space-y-1">
+            <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
+            <div class="bg-slate-950 p-4 rounded-xl text-sm space-y-2 border border-purple-950">
+                <p class="text-pink-300 font-bold">Tu ID: <span id="modal-client-id" class="font-mono text-emerald-400">CLI-0000</span></p>
+                <div class="border-t border-purple-950 pt-2 font-mono text-xs text-slate-300 space-y-1">
                     <p><strong>Banco:</strong> <span id="display-bank-name" class="text-white">--</span></p>
                     <p><strong>CLABE:</strong> <span id="display-bank-clabe" class="text-white">--</span></p>
                     <p><strong>Titular:</strong> <span id="display-bank-holder" class="text-white">--</span></p>
-                    <p><strong>Concepto:</strong> <span id="modal-client-id-concept" class="text-purple-300">CLI-0000</span></p>
+                    <p><strong>Concepto:</strong> <span id="modal-client-id-concept" class="text-pink-300">CLI-0000</span></p>
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2">
@@ -284,7 +343,6 @@
         let currentUser = JSON.parse(localStorage.getItem('logged_user') || 'null');
         let bankConfig = { bank: 'BBVA', clabe: '1234567890', holder: 'Admin' };
 
-        // Productos con imágenes asignadas
         let state = {
             products: [
                 { id: 'net_1m', name: 'Netflix premium mes', price: 150.00, image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop', days: 30 },
@@ -326,6 +384,45 @@
                     }
                 });
             }
+
+            // Escuchar todas las ventas para el Panel de Administrador y calcular Métrica de Ventas
+            window.dbOnValue(window.dbRef(window.db, 'sales'), (snapshot) => {
+                const salesListAdmin = document.getElementById('admin-sales-list');
+                const totalRevenueEl = document.getElementById('admin-total-revenue');
+                const totalCountEl = document.getElementById('admin-total-count');
+
+                if (salesListAdmin) {
+                    salesListAdmin.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const salesObj = snapshot.val();
+                        const salesArr = Object.values(salesObj);
+
+                        let totalRevenue = 0;
+                        let totalCount = salesArr.length;
+
+                        salesArr.reverse().forEach(sale => {
+                            totalRevenue += parseFloat(sale.price || 0);
+                            salesListAdmin.innerHTML += `
+                                <tr>
+                                    <td class="p-3 font-mono text-purple-300">${sale.clientId} <br><span class="text-xs text-slate-400">(${sale.username})</span></td>
+                                    <td class="p-3 font-bold text-white">${sale.productName}</td>
+                                    <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${sale.credentials}</td> <td class="p-3 font-bold text-emerald-400">$${parseFloat(sale.price).toFixed(2)}</td>
+                                    <td class="p-3 text-xs text-slate-300">${sale.date}</td>
+                                    <td class="p-3 text-xs text-amber-400 font-semibold">${sale.expireDate}</td>
+                                </tr>
+                            `;
+                        });
+
+                        if (totalRevenueEl) totalRevenueEl.innerText = `$${totalRevenue.toFixed(2)} MXN`;
+                        if (totalCountEl) totalCountEl.innerText = `${totalCount} Cuenta(s)`;
+
+                    } else {
+                        salesListAdmin.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Aún no hay ventas registradas.</td></tr>`;
+                        if (totalRevenueEl) totalRevenueEl.innerText = `$0.00 MXN`;
+                        if (totalCountEl) totalCountEl.innerText = `0 Cuentas`;
+                    }
+                }
+            });
         });
 
         function switchAuthTab(tab) {
@@ -392,6 +489,12 @@
             window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
+        function reportAccountIssue(productName, credentials) {
+            if (!currentUser) return;
+            const msg = `Hola, necesito soporte técnico con mi cuenta.\n\n*Servicio:* ${productName}\n*Credenciales:*${credentials}\n*ID de Cliente:* ${currentUser.clientId}\n*Usuario:*${currentUser.username}\n\nLa cuenta presenta una caída/falla. ¿Me podrías ayudar a revisarla?`;
+            window.open(`https://wa.me/${ADMIN_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
         function renderProducts() {
             const container = document.getElementById('products-grid');
             const selectAdmin = document.getElementById('stock-product-id');
@@ -408,27 +511,24 @@
                 selectPrice.innerHTML += `<option value="${prod.id}">${prod.name}</option>`;
 
                 container.innerHTML += `
-                    <div class="bg-slate-900 rounded-2xl overflow-hidden border border-purple-900/30 flex flex-col justify-between shadow-lg">
+                    <div class="bg-slate-900/80 rounded-2xl overflow-hidden border border-purple-900/30 flex flex-col justify-between shadow-lg glow-card transition duration-300">
                         <div class="relative h-36 w-full overflow-hidden bg-slate-950">
-                            <img src="${prod.image}" alt="${prod.name}" class="w-full h-full object-cover opacity-80 hover:scale-105 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-                            <span class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-xs px-2.5 py-1 rounded-full font-bold ${stockCount > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                            <img src="${prod.image}" alt="${prod.name}" class="w-full h-full object-cover opacity-75 hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                            <span class="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-slate-700 text-xs px-2.5 py-1 rounded-full font-bold ${stockCount > 0 ? 'text-emerald-400' : 'text-rose-400'}">
                                 ${stockCount > 0 ? `${stockCount} disponible(s)` : 'Agotado'}
                             </span>
                         </div>
                         <div class="p-5 space-y-4 flex-1 flex flex-col justify-between">
                             <div>
                                 <h3 class="font-bold text-lg text-white">${prod.name}</h3>
-                                <p class="text-xs text-slate-400 mt-1">Duración: ${prod.days} días</p>
-                            </div>
-                            <div class="flex justify-between items-center pt-2">
-                                <span class="text-xl font-extrabold text-purple-300">$${prod.price.toFixed(2)} <span class="text-xs text-slate-400">MXN</span></span>
+                                <p class="text-xs text-slate-400 mt-1">Duración: ${prod.days} días</p> </div> <div class="flex justify-between items-center pt-2"> <span class="text-xl font-extrabold text-pink-400">$${prod.price.toFixed(2)} <span class="text-xs text-slate-400">MXN</span></span>
                             </div>
                             <button type="button" onclick="buyProduct('${prod.id}')" 
                                 ${stockCount === 0 ? 'disabled' : ''} 
                                 class="w-full py-2.5 rounded-xl font-bold text-sm transition shadow-lg ${
                                     stockCount > 0 
-                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/20' 
+                                    ? 'bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 hover:opacity-90 text-white shadow-purple-600/20' 
                                     : 'bg-slate-800 text-slate-600 cursor-not-allowed'
                                 }">
                                 ${stockCount > 0 ? 'Comprar Ahora' : 'Sin Stock'}
@@ -498,7 +598,7 @@
                         if (diffDays < 0) {
                             statusBadge = `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-circle-xmark"></i> Vencida</span>`;
                         } else if (diffDays <= 3) {
-                            statusBadge = `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-xs font-bold animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Vence en ${diffDays} día(s)</span>`;
+                            statusBadge = `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-xs font-bold animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Vence en ${diffDays} d</span>`;
                         } else {
                             statusBadge = `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-circle-check"></i> Activa (${diffDays}d)</span>`;
                         }
@@ -506,132 +606,4 @@
                         purchasesList.innerHTML += `
                             <tr>
                                 <td class="p-3 font-medium text-purple-200">${item.productName}</td>
-                                <td class="p-3 font-mono text-xs text-indigo-300 bg-slate-950/60 rounded-lg">${item.credentials}</td>
-                                <td class="p-3 font-bold text-emerald-400">$${item.price.toFixed(2)}</td>
-                                <td class="p-3 text-slate-400 text-xs">Comprado: ${item.date}<br><span class="text-amber-400 font-semibold">Vence: ${item.expireDate}</span></td>
-                                <td class="p-3">${statusBadge}</td>
-                            </tr>
-                        `;
-                    });
-                }
-            }
-        }
-
-        async function buyProduct(productId) {
-            const product = state.products.find(p => p.id === productId);
-            if (currentUser.balance < product.price) {
-                alert('Saldo insuficiente.');
-                return;
-            }
-
-            const itemIndex = state.inventory.findIndex(i => i.productId === productId && i.status === 'available');
-            if (itemIndex === -1) {
-                alert('Sin stock.');
-                return;
-            }
-
-            currentUser.balance -= product.price;
-            const item = state.inventory[itemIndex];
-            item.status = 'sold';
-
-            const expireDateObj = new Date();
-            expireDateObj.setDate(expireDateObj.getDate() + product.days);
-
-            if (!currentUser.purchases) currentUser.purchases = [];
-            currentUser.purchases.unshift({
-                productName: product.name,
-                credentials: item.credentials,
-                price: product.price,
-                date: new Date().toLocaleDateString(),
-                expireDate: expireDateObj.toLocaleDateString(),
-                expireDateRaw: expireDateObj.toISOString()
-            });
-
-            await window.dbSet(window.dbRef(window.db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
-            await window.dbSet(window.dbRef(window.db, `users/${currentUser.username}`), currentUser);
-
-            updateUI();
-            renderProducts();
-            alert(`¡Compra Exitosa!\nCuenta: ${item.credentials}`);
-        }
-
-        async function addCreditByClientID() {
-            const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
-            const amount = parseFloat(document.getElementById('add-credit-amount').value);
-
-            if (!targetClientId || !amount || amount <= 0) {
-                alert('Ingresa un ID y un monto válidos.');
-                return;
-            }
-
-            const clientRef = window.dbRef(window.db, `clients/${targetClientId}`);
-            const snapshot = await window.dbGet(clientRef);
-
-            let currentBalance = 0;
-            let username = null;
-
-            if (snapshot.exists()) {
-                const cData = snapshot.val();
-                currentBalance = parseFloat(cData.balance || 0);
-                username = cData.username;
-            }
-
-            const newBalance = currentBalance + amount;
-
-            await window.dbSet(window.dbRef(window.db, `clients/${targetClientId}/balance`), newBalance);
-
-            if (username) {
-                await window.dbSet(window.dbRef(window.db, `users/${username}/balance`), newBalance);
-            }
-
-            document.getElementById('add-credit-client-id').value = '';
-            alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente ${targetClientId}.`);
-        }
-
-        function addStock() {
-            const prodId = document.getElementById('stock-product-id').value;
-            const creds = document.getElementById('stock-credentials').value.trim();
-            const codeLink = document.getElementById('stock-code-link').value.trim();
-
-            if (!creds) return;
-
-            state.inventory.push({ id: Date.now(), productId: prodId, credentials: creds, codeLink: codeLink, status: 'available' });
-            document.getElementById('stock-credentials').value = '';
-            renderProducts();
-            alert('Inventario actualizado');
-        }
-
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-
-        function verifyAdminPIN() {
-            if (document.getElementById('admin-pin-input').value === ADMIN_PIN) {
-                closeAdminModal();
-                switchTab('admin');
-            } else {
-                alert('Clave incorrecta');
-            }
-        }
-
-        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
-        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
-
-        function switchTab(tab) {
-            document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
-            document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
-        }
-
-        function initStore() {
-            if (currentUser) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                renderProducts();
-                updateUI();
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-            }
-        }
-
-        initStore();
-    </script>
-</body>
-</html>
+                                <td class="p-3 font-mono text-xs text-pink-300 bg-slate-950/80 rounded-lg">${item.credentials
