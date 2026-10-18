@@ -144,7 +144,7 @@
                 </button>
             </div>
 
-            <!-- Métricas Admin con Botón de Reiniciar/Borrar Contador -->
+            <!-- Métricas Admin -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/40 flex items-center justify-between shadow-xl">
                     <div>
@@ -317,7 +317,7 @@
     <!-- Script Principal con Firebase integrado -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDha0rM7tpYgfP8_pSBtwlF1k1QQVRn50k",
@@ -362,9 +362,7 @@
                 { id: 'prime_m', name: 'Prime video mes', price: 99.00, image: 'https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?w=500&auto=format&fit=crop', days: 30 },
                 { id: 'para', name: 'Paramount', price: 85.00, image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop', days: 30 }
             ],
-            inventory: [
-                { id: 1, productId: 'net_1m', credentials: 'demo@mail.com : Pass123', codeLink: '', status: 'available' }
-            ]
+            inventory: []
         };
 
         window.switchAuthTab = function(tab) {
@@ -515,14 +513,15 @@
             if (product) document.getElementById('new-product-price').value = product.price;
         };
 
-        window.updateProductPrice = function() {
+        window.updateProductPrice = async function() {
             const prodId = document.getElementById('price-product-id').value;
             const newPrice = parseFloat(document.getElementById('new-product-price').value);
             const product = state.products.find(p => p.id === prodId);
             if (product && newPrice > 0) {
                 product.price = newPrice;
+                await set(ref(db, `config/products`), state.products);
                 renderProducts();
-                alert('Precio actualizado');
+                alert('Precio actualizado y guardado en la nube');
             }
         };
 
@@ -599,7 +598,7 @@
 
             const itemIndex = state.inventory.findIndex(i => i.productId === productId && i.status === 'available');
             if (itemIndex === -1) {
-                alert('Sin stock.');
+                alert('Sin stock disponible para este producto.');
                 return;
             }
 
@@ -626,6 +625,7 @@
 
             await set(ref(db, `clients/${currentUser.clientId}/balance`), currentUser.balance);
             await set(ref(db, `users/${currentUser.username}`), currentUser);
+            await set(ref(db, 'config/inventory'), state.inventory);
 
             const newSaleKey = Date.now();
             await set(ref(db, `sales/${newSaleKey}`), newPurchase);
@@ -668,17 +668,23 @@
             alert(`¡Éxito! Se han abonado $${amount.toFixed(2)} MXN al cliente ${targetClientId}.`);
         };
 
-        window.addStock = function() {
+        window.addStock = async function() {
             const prodId = document.getElementById('stock-product-id').value;
             const creds = document.getElementById('stock-credentials').value.trim();
             const codeLink = document.getElementById('stock-code-link').value.trim();
 
-            if (!creds) return;
+            if (!creds) {
+                alert('Ingresa las credenciales.');
+                return;
+            }
 
             state.inventory.push({ id: Date.now(), productId: prodId, credentials: creds, codeLink: codeLink, status: 'available' });
+            await set(ref(db, 'config/inventory'), state.inventory);
+
             document.getElementById('stock-credentials').value = '';
+            document.getElementById('stock-code-link').value = '';
             renderProducts();
-            alert('Inventario actualizado');
+            alert('¡Stock guardado en la nube con éxito!');
         };
 
         window.openAdminModal = function() { document.getElementById('admin-modal').classList.remove('hidden'); };
@@ -711,7 +717,23 @@
             }
         }
 
-        // Cargar datos en tiempo real
+        // Cargar precios y stock desde Firebase en tiempo real
+        onValue(ref(db, 'config/products'), (snapshot) => {
+            if (snapshot.exists()) {
+                state.products = snapshot.val();
+                renderProducts();
+            }
+        });
+
+        onValue(ref(db, 'config/inventory'), (snapshot) => {
+            if (snapshot.exists()) {
+                state.inventory = snapshot.val();
+            } else {
+                state.inventory = [];
+            }
+            renderProducts();
+        });
+
         onValue(ref(db, 'config/bank'), (snapshot) => {
             if (snapshot.exists()) {
                 bankConfig = snapshot.val();
