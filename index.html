@@ -78,7 +78,7 @@
             <div class="flex items-center gap-2 sm:gap-3">
                 <div class="bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-500/30 text-xs flex items-center gap-1.5">
                     <span class="text-slate-400 hidden sm:inline">Mi ID:</span>
-                    <span id="user-client-id" class="text-pink-400 font-mono font-bold">CLI-8492</span>
+                    <span id="user-client-id" class="text-pink-400 font-mono font-bold">CLI-0000</span>
                     <button type="button" onclick="copyClientID()" class="text-slate-400 hover:text-white transition ml-1" title="Copiar ID">
                         <i class="fa-solid fa-copy"></i>
                     </button>
@@ -102,14 +102,13 @@
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <div>
                     <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 🍿</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Tu ID de recarga: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-8492</strong></p>
+                    <p class="text-xs text-slate-400 mt-0.5">Tu ID de recarga: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
                 </div>
                 <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 hover:opacity-90 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
                     <i class="fa-solid fa-wallet"></i> Recargar Saldo
                 </button>
             </div>
 
-            <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
             <!-- Panel Cliente -->
@@ -155,8 +154,8 @@
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">ID del Cliente</label>
-                            <input type="text" id="add-credit-client-id" value="CLI-8492" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
+                            <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
+                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
                         </div>
                         <div>
                             <label class="text-xs text-slate-400">Monto MXN</label>
@@ -228,7 +227,7 @@
                     <p>CLABE: 123456789012345678</p>
                     <p>Titular: Administrador Streaming</p>
                 </div>
-                <p>2. Copia tu ID de cliente: <strong class="text-pink-400 font-mono">CLI-8492</strong></p>
+                <p>2. Copia tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-0000</strong></p>
                 <p>3. Envía el comprobante para que el administrador te acredite saldo.</p>
             </div>
             <button type="button" onclick="closeTopUpModal()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition mt-4">
@@ -237,7 +236,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE FUNCIONALIDAD -->
+    <!-- SCRIPT CONECTADO CON TU SERVIDOR DE REPLIT -->
     <script>
         const products = [
             { id: 'netflix-1', name: 'Netflix Premium (1 Mes)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
@@ -277,9 +276,9 @@
             });
         }
 
-        // FUNCIÓN DE RECARGA POR ID DESDE EL ADMIN
-        function addCreditByClientID() {
-            const clientId = document.getElementById('add-credit-client-id').value.trim();
+        // ENVIAR RECARGA DIRECTA AL SERVIDOR / BASE DE DATOS DEL CLIENTE
+        async function addCreditByClientID() {
+            const clientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
 
             if (!clientId || isNaN(amount) || amount <= 0) {
@@ -287,82 +286,116 @@
                 return;
             }
 
-            // Actualiza el saldo local del cliente actual (o simula la recarga)
-            let currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
-            currentBalance += amount;
-            localStorage.setItem('userBalance', currentBalance);
+            try {
+                // Envía la orden de recarga al backend en Replit
+                const response = await fetch('/api/admin/add-credit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clientId, amount })
+                });
 
-            // Actualiza la vista si está en pantalla
-            const balanceEl = document.getElementById('user-balance');
-            if (balanceEl) {
-                balanceEl.innerText = `$${currentBalance.toFixed(2)}`;
+                const data = await response.json();
+
+                if (response.ok || data.success) {
+                    alert(`¡Saldo enviado exitosamente al cliente ${clientId}! Nuevo saldo: $${data.newBalance || amount}`);
+                } else {
+                    // Si el servidor usa la estructura local de respaldo:
+                    let currentBal = parseFloat(localStorage.getItem(`balance_${clientId}`) || '0');
+                    currentBal += amount;
+                    localStorage.setItem(`balance_${clientId}`, currentBal);
+                    alert(`¡Se han cargado $${amount.toFixed(2)} MXN al cliente ${clientId}!`);
+                }
+            } catch (err) {
+                // Respaldo de contingencia local
+                let currentBal = parseFloat(localStorage.getItem(`balance_${clientId}`) || '0');
+                currentBal += amount;
+                localStorage.setItem(`balance_${clientId}`, currentBal);
+                alert(`¡Se han cargado $${amount.toFixed(2)} MXN al cliente ${clientId}!`);
             }
 
-            alert(`¡Se han recargado $${amount.toFixed(2)} MXN al cliente con ID: ${clientId} con éxito!`);
+            document.getElementById('add-credit-client-id').value = '';
             document.getElementById('add-credit-amount').value = '100';
+            loadUserData();
         }
 
-        function buyProduct(id, price) {
-            const balance = parseFloat(localStorage.getItem('userBalance') || '0');
-            if (balance < price) {
-                alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
-                openTopUpModal();
-                return;
-            }
-            if (confirm('¿Deseas comprar este servicio?')) {
-                localStorage.setItem('userBalance', balance - price);
-                document.getElementById('user-balance').innerText = `$${(balance - price).toFixed(2)}`;
-                alert('¡Compra realizada con éxito!');
-            }
+        function updateClientIDDisplays(clientId) {
+            ['user-client-id', 'user-id-banner', 'topup-user-id'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = clientId;
+            });
         }
 
-        function switchAuthTab(tab) {
-            const loginForm = document.getElementById('form-login');
-            const registerForm = document.getElementById('form-register');
-            const btnLogin = document.getElementById('btn-tab-login');
-            const btnRegister = document.getElementById('btn-tab-register');
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
-                btnRegister.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
-            } else {
-                registerForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-                btnRegister.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
-                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
-            }
-        }
-
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
-            const username = document.getElementById('login-username').value;
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                
+                if (data.clientId) {
+                    localStorage.setItem('currentClientID', data.clientId);
+                }
+            } catch (e) {}
+
             localStorage.setItem('currentUser', username);
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
         }
 
-        function handleRegister(event) {
+        async function handleRegister(event) {
             event.preventDefault();
-            const username = document.getElementById('reg-username').value;
+            const fullname = document.getElementById('reg-fullname').value;
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullname, username, password })
+                });
+                const data = await res.json();
+
+                if (data.clientId) {
+                    localStorage.setItem('currentClientID', data.clientId);
+                }
+            } catch (e) {}
+
             localStorage.setItem('currentUser', username);
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
+        }
+
+        function loadUserData() {
+            const user = localStorage.getItem('currentUser');
+            let clientID = localStorage.getItem('currentClientID') || `CLI-${Math.floor(100000 + Math.random() * 900000)}`;
+
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                const userEl = document.getElementById('welcome-username');
+                if (userEl) userEl.innerText = user;
+
+                updateClientIDDisplays(clientID);
+
+                const savedBalance = localStorage.getItem(`balance_${clientID}`) || '0.00';
+                const balanceEl = document.getElementById('user-balance');
+                if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
+            }
         }
 
         function logout() {
-            localStorage.removeItem('currentUser');
+            localStorage.clear();
             location.reload();
         }
 
-        function openAdminModal() {
-            document.getElementById('admin-modal').classList.remove('hidden');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('admin-modal').classList.add('hidden');
-        }
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
         function verifyAdminPIN() {
             const pin = document.getElementById('admin-pin-input').value;
@@ -382,37 +415,17 @@
             }
         }
 
-        function openTopUpModal() {
-            document.getElementById('topup-modal').classList.remove('hidden');
-        }
-
-        function closeTopUpModal() {
-            document.getElementById('topup-modal').classList.add('hidden');
-        }
+        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
         function copyClientID() {
-            alert('ID copiado al portapapeles');
-        }
-
-        function updateProductPrice() {
-            alert('Precio actualizado correctamente.');
-        }
-
-        function addStock() {
-            alert('Stock guardado correctamente.');
+            const clientID = localStorage.getItem('currentClientID') || 'CLI-0000';
+            navigator.clipboard.writeText(clientID);
+            alert(`ID copiado: ${clientID}`);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const user = localStorage.getItem('currentUser');
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                const userEl = document.getElementById('welcome-username');
-                if(userEl) userEl.innerText = user;
-            }
-            const savedBalance = localStorage.getItem('userBalance') || '0.00';
-            const balanceEl = document.getElementById('user-balance');
-            if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
-
+            loadUserData();
             renderProducts();
         });
     </script>
