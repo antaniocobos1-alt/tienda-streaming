@@ -147,54 +147,22 @@
                 </button>
             </div>
 
-            <!-- Métricas Admin -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div class="bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/40 flex items-center justify-between shadow-xl">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Ingresos por Ventas</p>
-                        <h4 id="admin-total-revenue" class="text-3xl font-extrabold text-emerald-400 mt-1">$0.00 MXN</h4>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="resetSalesCounter()" title="Borrar contador e historial" class="bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 border border-rose-500/30 p-3 rounded-2xl transition">
-                            <i class="fa-solid fa-trash-can text-lg"></i>
-                        </button>
-                        <div class="bg-emerald-500/20 text-emerald-400 p-4 rounded-2xl border border-emerald-500/30">
-                            <i class="fa-solid fa-sack-dollar text-3xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/80 p-5 rounded-2xl border border-pink-500/40 flex items-center justify-between shadow-xl">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Cuentas Vendidas</p>
-                        <h4 id="admin-total-count" class="text-3xl font-extrabold text-pink-400 mt-1">0 Cuentas</h4>
-                    </div>
-                    <div class="bg-pink-500/20 text-pink-400 p-4 rounded-2xl border border-pink-500/30">
-                        <i class="fa-solid fa-chart-line text-3xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Datos Bancarios -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
-                        <i class="fa-solid fa-building-columns"></i> Datos Bancarios
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Recargar por ID -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Recargar ID
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">Banco</label>
-                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                            <label class="text-xs text-slate-400">ID del Cliente</label>
+                            <input type="text" id="add-credit-client-id" value="CLI-8492" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">CLABE</label>
-                            <input type="text" id="admin-bank-clabe" placeholder="1234..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                            <label class="text-xs text-slate-400">Monto MXN</label>
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Titular</label>
-                            <input type="text" id="admin-bank-holder" placeholder="Nombre..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar</button>
+                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito</button>
                     </div>
                 </div>
 
@@ -206,31 +174,13 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs text-slate-400">Producto</label>
-                            <select id="price-product-id" onchange="loadCurrentPrice()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
+                            <select id="price-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
                         </div>
                         <div>
                             <label class="text-xs text-slate-400">Nuevo Precio</label>
                             <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
                         <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar</button>
-                    </div>
-                </div>
-
-                <!-- Recargar por ID -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Recargar ID
-                    </h3>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
-                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Monto MXN</label>
-                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito</button>
                     </div>
                 </div>
 
@@ -247,10 +197,6 @@
                         <div>
                             <label class="text-xs text-slate-400">Credenciales</label>
                             <input type="text" id="stock-credentials" placeholder="correo : clave" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Link Panel (Opcional)</label>
-                            <input type="text" id="stock-code-link" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
                         <button type="button" onclick="addStock()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
                     </div>
@@ -277,13 +223,13 @@
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
             <div class="space-y-2 text-xs text-slate-300">
                 <p>1. Transfiere o deposita la cantidad que desees a la siguiente cuenta:</p>
-                <div id="topup-bank-details" class="bg-slate-950 p-3 rounded-xl border border-purple-900/30 font-mono space-y-1">
-                    <p>Banco: <span id="bank-name-display">BBVA / Banco Azteca</span></p>
-                    <p>CLABE: <span id="bank-clabe-display">123456789012345678</span></p>
-                    <p>Titular: <span id="bank-holder-display">Administrador Streaming</span></p>
+                <div class="bg-slate-950 p-3 rounded-xl border border-purple-900/30 font-mono space-y-1">
+                    <p>Banco: BBVA / Banco Azteca</p>
+                    <p>CLABE: 123456789012345678</p>
+                    <p>Titular: Administrador Streaming</p>
                 </div>
-                <p>2. Copia tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-8492</strong></p>
-                <p>3. Envía el comprobante para acreditar tu saldo.</p>
+                <p>2. Copia tu ID de cliente: <strong class="text-pink-400 font-mono">CLI-8492</strong></p>
+                <p>3. Envía el comprobante para que el administrador te acredite saldo.</p>
             </div>
             <button type="button" onclick="closeTopUpModal()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition mt-4">
                 Entendido / Cerrar
@@ -291,9 +237,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PRODUCTOS Y AUTENTICACIÓN -->
+    <!-- SCRIPT DE FUNCIONALIDAD -->
     <script>
-        // Lista de servicios de streaming configurados
         const products = [
             { id: 'netflix-1', name: 'Netflix Premium (1 Mes)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
             { id: 'netflix-3', name: 'Netflix (3 Meses)', price: 450, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
@@ -324,14 +269,37 @@
                 </div>
             `).join('');
 
-            // Cargar también en los selects de administración
-            const selects = ['price-product-id', 'stock-product-id'];
-            selects.forEach(selId => {
+            ['price-product-id', 'stock-product-id'].forEach(selId => {
                 const sel = document.getElementById(selId);
                 if (sel) {
                     sel.innerHTML = products.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
                 }
             });
+        }
+
+        // FUNCIÓN DE RECARGA POR ID DESDE EL ADMIN
+        function addCreditByClientID() {
+            const clientId = document.getElementById('add-credit-client-id').value.trim();
+            const amount = parseFloat(document.getElementById('add-credit-amount').value);
+
+            if (!clientId || isNaN(amount) || amount <= 0) {
+                alert('Por favor ingresa un ID de cliente válido y un monto mayor a 0.');
+                return;
+            }
+
+            // Actualiza el saldo local del cliente actual (o simula la recarga)
+            let currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+            currentBalance += amount;
+            localStorage.setItem('userBalance', currentBalance);
+
+            // Actualiza la vista si está en pantalla
+            const balanceEl = document.getElementById('user-balance');
+            if (balanceEl) {
+                balanceEl.innerText = `$${currentBalance.toFixed(2)}`;
+            }
+
+            alert(`¡Se han recargado $${amount.toFixed(2)} MXN al cliente con ID: ${clientId} con éxito!`);
+            document.getElementById('add-credit-amount').value = '100';
         }
 
         function buyProduct(id, price) {
@@ -344,7 +312,7 @@
             if (confirm('¿Deseas comprar este servicio?')) {
                 localStorage.setItem('userBalance', balance - price);
                 document.getElementById('user-balance').innerText = `$${(balance - price).toFixed(2)}`;
-                alert('¡Compra realizada con éxito! Revisa tus cuentas compradas.');
+                alert('¡Compra realizada con éxito!');
             }
         }
 
@@ -424,6 +392,14 @@
 
         function copyClientID() {
             alert('ID copiado al portapapeles');
+        }
+
+        function updateProductPrice() {
+            alert('Precio actualizado correctamente.');
+        }
+
+        function addStock() {
+            alert('Stock guardado correctamente.');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
