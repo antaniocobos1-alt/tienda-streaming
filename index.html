@@ -145,7 +145,7 @@
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
                                 <th class="p-3">Fecha Compra</th>
-                                <th class="p-3">Vencimiento / Soporte</th>
+                                <th class="p-3">Vencimiento / Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-purple-950/50">
@@ -770,6 +770,19 @@
             });
         }
 
+        /* --- COPIAR CREDENCIALES DESDE CLIENTE --- */
+        function copyAccountCredentials(elementId) {
+            const credsElement = document.getElementById(elementId);
+            if (credsElement) {
+                const textToCopy = credsElement.innerText;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert('¡Credenciales copiadas al portapapeles con éxito! 📋✨');
+                }).catch(err => {
+                    alert('No se pudo copiar automáticamente.');
+                });
+            }
+        }
+
         /* --- CONTADOR GLOBAL, HISTORIAL Y RECORDATORIOS --- */
         function loadGlobalSalesStats() {
             const clientsRef = database.ref('clients');
@@ -910,21 +923,26 @@
                 const purchasesList = document.getElementById('purchases-list');
                 if (data.purchases) {
                     let html = '';
-                    Object.values(data.purchases).forEach(item => {
+                    Object.entries(data.purchases).forEach(([purchaseId, item]) => {
                         const supportMsg = `Hola, soy ${currentUsername} (ID: ${clientID}). Tengo un problema con mi cuenta de ${item.productName} comprada el ${item.purchaseDate}. Las credenciales son: ${item.credentials}`;
                         const encodedMsg = encodeURIComponent(supportMsg);
 
                         html += `
                             <tr class="hover:bg-purple-950/20 transition">
                                 <td class="p-3 font-bold text-white">${item.productName}</td>
-                                <td class="p-3 font-mono text-pink-400 select-all">${item.credentials}</td>
+                                <td class="p-3 font-mono text-pink-400 select-all" id="creds-${purchaseId}">${item.credentials}</td>
                                 <td class="p-3 text-emerald-400 font-bold">$${item.price} MXN</td>
                                 <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
-                                <td class="p-3 text-xs space-y-1">
+                                <td class="p-3 text-xs space-y-2">
                                     <div class="text-amber-400 font-bold">${item.expireDate}</div>
-                                    <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
-                                        <i class="fa-brands fa-whatsapp"></i> Soporte
-                                    </a>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <button onclick="copyAccountCredentials('creds-${purchaseId}')" class="inline-flex items-center gap-1 bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
+                                            <i class="fa-solid fa-copy"></i> Copiar Cuenta
+                                        </button>
+                                        <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
+                                            <i class="fa-brands fa-whatsapp"></i> Soporte
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -1023,105 +1041,4 @@
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('form-login');
             const registerForm = document.getElementById('form-register');
-            const btnLogin = document.getElementById('btn-tab-login');
-            const btnRegister = document.getElementById('btn-tab-register');
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
-                btnRegister.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
-            } else {
-                registerForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-                btnRegister.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
-                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('currentClientID');
-            location.reload();
-        }
-
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-
-        function verifyAdminPIN() {
-            const pin = document.getElementById('admin-pin-input').value;
-            if (pin.length > 0) {
-                closeAdminModal();
-                document.getElementById('tab-shop').classList.add('hidden');
-                document.getElementById('tab-admin').classList.remove('hidden');
-            } else {
-                alert('PIN Incorrecto');
-            }
-        }
-
-        function switchTab(tab) {
-            if (tab === 'shop') {
-                document.getElementById('tab-admin').classList.add('hidden');
-                document.getElementById('tab-shop').classList.remove('hidden');
-            }
-        }
-
-        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
-        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
-
-        function copyClientID() {
-            const clientID = localStorage.getItem('currentClientID') || 'CLI-0000';
-            navigator.clipboard.writeText(clientID);
-            alert(`ID copiado al portapapeles: ${clientID}`);
-        }
-
-        function updateProductPrice() {
-            const prodId = document.getElementById('price-product-id').value;
-            const newPrice = parseFloat(document.getElementById('new-product-price').value);
-
-            if (!prodId || isNaN(newPrice) || newPrice <= 0) {
-                alert('Ingresa un precio válido.');
-                return;
-            }
-
-            let currentProducts = getProducts();
-            const prodIndex = currentProducts.findIndex(p => p.id === prodId);
-            if (prodIndex !== -1) {
-                currentProducts[prodIndex].price = newPrice;
-                localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
-                renderProducts();
-                alert('Precio actualizado correctamente.');
-                document.getElementById('new-product-price').value = '';
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedBg = localStorage.getItem('storeCustomBg');
-            if (savedBg) {
-                applyStoreBackground(savedBg);
-            }
-
-            const user = localStorage.getItem('currentUser');
-            let clientID = localStorage.getItem('currentClientID');
-
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                const userEl = document.getElementById('welcome-username');
-                if (userEl) userEl.innerText = user;
-
-                if (!clientID) {
-                    clientID = generateUniqueClientID();
-                    localStorage.setItem(`clientID_${user}`, clientID);
-                    localStorage.setItem('currentClientID', clientID);
-                }
-                updateClientIDDisplays(clientID);
-                listenUserData(clientID);
-            }
-
-            renderProducts();
-            loadBankInfo();
-            loadGlobalSalesStats();
-        });
-    </script>
-</body>
-</html>
+            const btnLogin = document.getElementById('
