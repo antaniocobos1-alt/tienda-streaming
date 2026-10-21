@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOCAL ROBUSTO -->
+    <!-- SCRIPT DEFINITIVO DE CLIENTES Y RECARGAS -->
     <script>
         let defaultProducts = [
             { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
@@ -320,7 +320,7 @@
             });
         }
 
-        // FUNCIÓN DE RECARGA ROBUSTA POR ID (ALMACENAMIENTO GLOBAL COMPARTIDO)
+        // SISTEMA DE RECARGA DIRECTA POR ID
         function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
@@ -330,14 +330,10 @@
                 return;
             }
 
-            // Obtener saldo previo de ese ID exacto
             let targetBalance = parseFloat(localStorage.getItem(`balance_${targetClientId}`) || '0');
             targetBalance += amount;
-            
-            // Guardar de forma persistente
             localStorage.setItem(`balance_${targetClientId}`, targetBalance);
 
-            // Refrescar si el cliente está abierto en esta misma sesión/pestaña
             const currentClientID = localStorage.getItem('currentClientID');
             if (currentClientID === targetClientId) {
                 const balanceEl = document.getElementById('user-balance');
