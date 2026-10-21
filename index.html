@@ -6,6 +6,11 @@
     <title>Streaming Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         body {
             background: radial-gradient(circle at top, #1e1035 0%, #090514 100%);
@@ -170,10 +175,10 @@
                     </div>
                 </div>
 
-                <!-- Recargar por ID -->
+                <!-- Recargar por ID Firebase -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Recargar por ID Único
+                        <i class="fa-solid fa-user-plus"></i> Recargar por ID (Firebase)
                     </h3>
                     <div class="space-y-3">
                         <div>
@@ -184,7 +189,7 @@
                             <label class="text-xs text-slate-400">Monto MXN</label>
                             <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Saldo a ID</button>
+                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito en la Nube</button>
                     </div>
                 </div>
 
@@ -263,8 +268,19 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE RECARGA POR ID ÚNICO -->
+    <!-- SCRIPT FIREBASE -->
     <script>
+        // CONFIGURACIÓN DE FIREBASE
+        const firebaseConfig = {
+            databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com" // URL de tu captura
+        };
+
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
         let defaultProducts = [
             { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
             { id: 'netflix-comp', name: 'Netflix (Cuenta Completa)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
@@ -320,7 +336,7 @@
             });
         }
 
-        // Recarga de saldo vinculada al ID único del cliente (Sincronización compartida local)
+        // RECARGA DIRECTA A LA BASE DE DATOS DE FIREBASE
         function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
@@ -330,16 +346,28 @@
                 return;
             }
 
-            let globalStore = JSON.parse(localStorage.getItem('storeClientBalances') || '{}');
-            globalStore[targetClientId] = (globalStore[targetClientId] || 0) + amount;
-            localStorage.setItem('storeClientBalances', JSON.stringify(globalStore));
+            const clientRef = database.ref('clients/' + targetClientId);
 
-            // Respaldo individual directo
-            localStorage.setItem(`balance_${targetClientId}`, globalStore[targetClientId]);
+            clientRef.child('balance').transaction((currentBalance) => {
+                return (currentBalance || 0) + amount;
+            }, (error, committed) => {
+                if (error) {
+                    alert('Error al recargar saldo en Firebase: ' + error.message);
+                } else if (committed) {
+                    alert(`¡ÉXITO! Se recargaron $${amount.toFixed(2)} MXN a la cuenta ${targetClientId} en la nube.`);
+                    document.getElementById('add-credit-client-id').value = '';
+                    document.getElementById('add-credit-amount').value = '100';
+                }
+            });
+        }
 
-            alert(`¡Se han acreditado $${amount.toFixed(2)} MXN correctamente al ID: ${targetClientId}!`);
-            document.getElementById('add-credit-client-id').value = '';
-            document.getElementById('add-credit-amount').value = '100';
+        // ESCUCHAR SALDO EN TIEMPO REAL DESDE FIREBASE
+        function listenUserBalance(clientID) {
+            const clientRef = database.ref('clients/' + clientID + '/balance');
+            clientRef.on('value', (snapshot) => {
+                const val = snapshot.val() || 0;
+                document.getElementById('user-balance').innerText = `$${parseFloat(val).toFixed(2)}`;
+            });
         }
 
         function updateBankInfo() {
@@ -409,22 +437,22 @@
 
         function buyProduct(id, price) {
             const currentID = localStorage.getItem('currentClientID');
-            let globalStore = JSON.parse(localStorage.getItem('storeClientBalances') || '{}');
-            let balance = globalStore[currentID] !== undefined ? globalStore[currentID] : parseFloat(localStorage.getItem(`balance_${currentID}`) || '0');
-            
-            if (balance < price) {
-                alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
-                openTopUpModal();
-                return;
-            }
-            if (confirm('¿Deseas comprar este servicio?')) {
-                balance -= price;
-                globalStore[currentID] = balance;
-                localStorage.setItem('storeClientBalances', JSON.stringify(globalStore));
-                localStorage.setItem(`balance_${currentID}`, balance);
-                document.getElementById('user-balance').innerText = `$${balance.toFixed(2)}`;
-                alert('¡Compra realizada con éxito!');
-            }
+            const clientRef = database.ref('clients/' + currentID + '/balance');
+
+            clientRef.once('value').then((snapshot) => {
+                let currentBalance = snapshot.val() || 0;
+                if (currentBalance < price) {
+                    alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
+                    openTopUpModal();
+                    return;
+                }
+
+                if (confirm('¿Deseas comprar este servicio?')) {
+                    clientRef.set(currentBalance - price).then(() => {
+                        alert('¡Compra realizada con éxito!');
+                    });
+                }
+            });
         }
 
         function switchAuthTab(tab) {
@@ -519,12 +547,7 @@
                     localStorage.setItem('currentClientID', clientID);
                 }
                 updateClientIDDisplays(clientID);
-
-                let globalStore = JSON.parse(localStorage.getItem('storeClientBalances') || '{}');
-                let savedBalance = globalStore[clientID] !== undefined ? globalStore[clientID] : parseFloat(localStorage.getItem(`balance_${clientID}`) || '0.00');
-                
-                const balanceEl = document.getElementById('user-balance');
-                if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
+                listenUserBalance(clientID);
             }
 
             renderProducts();
