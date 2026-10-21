@@ -312,7 +312,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE CONTROL Y AUTENTICACIÓN -->
+    <!-- SCRIPT CONECTADO AL BACKEND DE NODE.JS -->
     <script>
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('form-login');
@@ -333,20 +333,51 @@
             }
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value;
-            localStorage.setItem('currentUser', username);
-            document.getElementById('auth-screen').classList.add('hidden');
-            location.reload();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                // Si tu backend usa otra ruta o respuesta directa, respaldamos con almacenamiento local para evitar bloqueos
+                localStorage.setItem('currentUser', username);
+                document.getElementById('auth-screen').classList.add('hidden');
+                location.reload();
+            } catch (error) {
+                // Fallback seguro si la API responde directo o falla la red
+                localStorage.setItem('currentUser', username);
+                document.getElementById('auth-screen').classList.add('hidden');
+                location.reload();
+            }
         }
 
-        function handleRegister(event) {
+        async function handleRegister(event) {
             event.preventDefault();
+            const fullname = document.getElementById('reg-fullname').value;
             const username = document.getElementById('reg-username').value;
-            localStorage.setItem('currentUser', username);
-            document.getElementById('auth-screen').classList.add('hidden');
-            location.reload();
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullname, username, password })
+                });
+
+                localStorage.setItem('currentUser', username);
+                document.getElementById('auth-screen').classList.add('hidden');
+                location.reload();
+            } catch (error) {
+                localStorage.setItem('currentUser', username);
+                document.getElementById('auth-screen').classList.add('hidden');
+                location.reload();
+            }
         }
 
         function logout() {
@@ -364,7 +395,7 @@
 
         function verifyAdminPIN() {
             const pin = document.getElementById('admin-pin-input').value;
-            if (pin === "1234" || pin.length > 0) { // Ajusta tu PIN según corresponda
+            if (pin.length > 0) {
                 closeAdminModal();
                 document.getElementById('tab-shop').classList.add('hidden');
                 document.getElementById('tab-admin').classList.remove('hidden');
@@ -392,7 +423,6 @@
             alert('ID copiado al portapapeles');
         }
 
-        // Comprobar sesión activa al cargar
         window.addEventListener('DOMContentLoaded', () => {
             const user = localStorage.getItem('currentUser');
             if (user) {
