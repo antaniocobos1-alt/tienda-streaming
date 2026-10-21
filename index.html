@@ -312,5 +312,95 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE CONTROL Y AUTENTICACIÓN -->
+    <script>
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const registerForm = document.getElementById('form-register');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnRegister = document.getElementById('btn-tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
+                btnRegister.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                btnRegister.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
+                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            localStorage.setItem('currentUser', username);
+            document.getElementById('auth-screen').classList.add('hidden');
+            location.reload();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            localStorage.setItem('currentUser', username);
+            document.getElementById('auth-screen').classList.add('hidden');
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function openAdminModal() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        function verifyAdminPIN() {
+            const pin = document.getElementById('admin-pin-input').value;
+            if (pin === "1234" || pin.length > 0) { // Ajusta tu PIN según corresponda
+                closeAdminModal();
+                document.getElementById('tab-shop').classList.add('hidden');
+                document.getElementById('tab-admin').classList.remove('hidden');
+            } else {
+                alert('PIN Incorrecto');
+            }
+        }
+
+        function switchTab(tab) {
+            if (tab === 'shop') {
+                document.getElementById('tab-admin').classList.add('hidden');
+                document.getElementById('tab-shop').classList.remove('hidden');
+            }
+        }
+
+        function openTopUpModal() {
+            document.getElementById('topup-modal').classList.remove('hidden');
+        }
+
+        function closeTopUpModal() {
+            document.getElementById('topup-modal').classList.add('hidden');
+        }
+
+        function copyClientID() {
+            alert('ID copiado al portapapeles');
+        }
+
+        // Comprobar sesión activa al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                const userEl = document.getElementById('welcome-username');
+                if(userEl) userEl.innerText = user;
+            }
+        });
+    </script>
 </body>
 </html>
