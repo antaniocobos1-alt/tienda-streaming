@@ -738,7 +738,6 @@
                             
                             const expire = new Date();
                             expire.setDate(now.getDate() + parseInt(days));
-                            // Guardamos en formato YYYY-MM-DD para comparar fácilmente vencimientos
                             const expireDateStr = expire.toISOString().split('T')[0];
 
                             newPurchasesPromises.push(newPurchaseRef.set({
@@ -788,7 +787,6 @@
                             totalSoldCount += 1;
                             totalMoneyEarned += parseFloat(purchase.price || 0);
 
-                            // Lógica de recordatorio de vencimiento
                             const expireDate = purchase.expireDate || '';
                             let badgeStyle = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
                             let statusText = `Vence: ${expireDate}`;
@@ -1068,7 +1066,7 @@
             }
         }
 
-        function openTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
+        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
         function copyClientID() {
