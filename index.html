@@ -254,34 +254,6 @@
                 </div>
             </div>
 
-            <!-- NUEVA SECCIÓN: Gestión / Modificación de Nombres de Cuentas y Servicios -->
-            <div class="bg-slate-900/80 rounded-2xl p-6 border border-purple-500/30 space-y-4 shadow-xl">
-                <div class="flex justify-between items-center flex-wrap gap-3">
-                    <h3 class="text-lg font-bold flex items-center gap-2 text-purple-400">
-                        <i class="fa-solid fa-pen-to-square"></i> Gestión de Nombres de Cuentas / Servicios de Streaming
-                    </h3>
-                    <button type="button" onclick="openNewProductModal()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Añadir Nuevo Servicio
-                    </button>
-                </div>
-                <p class="text-xs text-slate-400">Aquí puedes modificar el nombre con el que aparecen tus cuentas de streaming en la tienda y en el menú desplegable.</p>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-950 text-slate-400">
-                            <tr>
-                                <th class="p-3">ID / Clave Interna</th>
-                                <th class="p-3">Nombre Actual del Servicio</th>
-                                <th class="p-3">Precio Base</th>
-                                <th class="p-3 text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-services-list" class="divide-y divide-slate-800">
-                            <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando servicios...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- Panel Admin: Historial Global -->
             <div class="bg-slate-900/80 rounded-2xl p-6 border border-amber-500/30 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-amber-400">
@@ -324,13 +296,4 @@
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
-            <p class="text-xs text-slate-400">Realiza tu transferencia o depósito bancario con los siguientes datos e incluye tu ID único en el concepto.</p>
-            <div id="topup-bank-info" class="bg-slate-950 p-4 rounded-xl text-xs space-y-2 border border-purple-900/30 text-slate-300">
-                <!-- Se llena dinámicamente -->
-            </div>
-            <button type="button" onclick="closeTopUpModal()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition">Cerrar</button>
-        </div>
-    </div>
-
-</body>
-</html>
+            <div class
