@@ -78,7 +78,7 @@
             <div class="flex items-center gap-2 sm:gap-3">
                 <div class="bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-500/30 text-xs flex items-center gap-1.5">
                     <span class="text-slate-400 hidden sm:inline">Mi ID:</span>
-                    <span id="user-client-id" class="text-pink-400 font-mono font-bold">CLI-0000</span>
+                    <span id="user-client-id" class="text-pink-400 font-mono font-bold">CLI-8492</span>
                     <button type="button" onclick="copyClientID()" class="text-slate-400 hover:text-white transition ml-1" title="Copiar ID">
                         <i class="fa-solid fa-copy"></i>
                     </button>
@@ -102,13 +102,14 @@
             <div class="flex justify-between items-center flex-wrap gap-3">
                 <div>
                     <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 🍿</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Tu ID de recarga: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
+                    <p class="text-xs text-slate-400 mt-0.5">Tu ID de recarga: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-8492</strong></p>
                 </div>
                 <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 hover:opacity-90 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
                     <i class="fa-solid fa-wallet"></i> Recargar Saldo
                 </button>
             </div>
 
+            <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
             <!-- Panel Cliente -->
@@ -127,7 +128,9 @@
                                 <th class="p-3">Estado / Soporte</th>
                             </tr>
                         </thead>
-                        <tbody id="purchases-list" class="divide-y divide-purple-950/50"></tbody>
+                        <tbody id="purchases-list" class="divide-y divide-purple-950/50">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -253,30 +256,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Panel Admin: Historial Global -->
-            <div class="bg-slate-900/80 rounded-2xl p-6 border border-amber-500/30 space-y-4 shadow-xl">
-                <h3 class="text-lg font-bold flex items-center gap-2 text-amber-400">
-                    <i class="fa-solid fa-receipt"></i> Historial General de Cuentas Vendidas
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-950 text-slate-400">
-                            <tr>
-                                <th class="p-3">Cliente / ID</th>
-                                <th class="p-3">Servicio</th>
-                                <th class="p-3">Credenciales</th>
-                                <th class="p-3">Precio</th>
-                                <th class="p-3">Fecha Compra</th>
-                                <th class="p-3">Vencimiento</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-sales-list" class="divide-y divide-slate-800">
-                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Cargando ventas...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </section>
     </main>
 
@@ -299,12 +278,12 @@
             <div class="space-y-2 text-xs text-slate-300">
                 <p>1. Transfiere o deposita la cantidad que desees a la siguiente cuenta:</p>
                 <div id="topup-bank-details" class="bg-slate-950 p-3 rounded-xl border border-purple-900/30 font-mono space-y-1">
-                    <p>Banco: <span id="bank-name-display">Cargando...</span></p>
-                    <p>CLABE: <span id="bank-clabe-display">Cargando...</span></p>
-                    <p>Titular: <span id="bank-holder-display">Cargando...</span></p>
+                    <p>Banco: <span id="bank-name-display">BBVA / Banco Azteca</span></p>
+                    <p>CLABE: <span id="bank-clabe-display">123456789012345678</span></p>
+                    <p>Titular: <span id="bank-holder-display">Administrador Streaming</span></p>
                 </div>
-                <p>2. Copia tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-0000</strong></p>
-                <p>3. Envía el comprobante de pago a tu proveedor indicando tu ID de cliente para que te reactive o acredite el saldo.</p>
+                <p>2. Copia tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-8492</strong></p>
+                <p>3. Envía el comprobante para acreditar tu saldo.</p>
             </div>
             <button type="button" onclick="closeTopUpModal()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition mt-4">
                 Entendido / Cerrar
@@ -312,8 +291,63 @@
         </div>
     </div>
 
-    <!-- SCRIPT CONECTADO AL BACKEND DE NODE.JS -->
+    <!-- SCRIPT DE PRODUCTOS Y AUTENTICACIÓN -->
     <script>
+        // Lista de servicios de streaming configurados
+        const products = [
+            { id: 'netflix-1', name: 'Netflix Premium (1 Mes)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
+            { id: 'netflix-3', name: 'Netflix (3 Meses)', price: 450, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
+            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
+            { id: 'disney-std', name: 'Disney+ Estándar', price: 140, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
+            { id: 'vix-1', name: 'ViX Premium (1 Mes)', price: 110, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
+            { id: 'vix-6', name: 'ViX Premium (6 Meses)', price: 500, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
+            { id: 'hbo-mes', name: 'Max / HBO (1 Mes)', price: 150, icon: 'fa-video', color: 'from-purple-600 to-indigo-950' },
+            { id: 'spotify-1', name: 'Spotify Individual (1 Mes)', price: 100, icon: 'fa-music', color: 'from-emerald-600 to-teal-950' }
+        ];
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = products.map(p => `
+                <div class="bg-slate-900/80 border border-purple-500/20 rounded-2xl p-5 space-y-4 glow-card flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white text-xl shadow-lg">
+                            <i class="fa-solid ${p.icon}"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${p.name}</h3>
+                        <p class="text-2xl font-extrabold text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
+                    </div>
+                    <button onclick="buyProduct('${p.id}', ${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
+                        Comprar Cuenta
+                    </button>
+                </div>
+            `).join('');
+
+            // Cargar también en los selects de administración
+            const selects = ['price-product-id', 'stock-product-id'];
+            selects.forEach(selId => {
+                const sel = document.getElementById(selId);
+                if (sel) {
+                    sel.innerHTML = products.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
+                }
+            });
+        }
+
+        function buyProduct(id, price) {
+            const balance = parseFloat(localStorage.getItem('userBalance') || '0');
+            if (balance < price) {
+                alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
+                openTopUpModal();
+                return;
+            }
+            if (confirm('¿Deseas comprar este servicio?')) {
+                localStorage.setItem('userBalance', balance - price);
+                document.getElementById('user-balance').innerText = `$${(balance - price).toFixed(2)}`;
+                alert('¡Compra realizada con éxito! Revisa tus cuentas compradas.');
+            }
+        }
+
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('form-login');
             const registerForm = document.getElementById('form-register');
@@ -333,51 +367,20 @@
             }
         }
 
-        async function handleLogin(event) {
+        function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                // Si tu backend usa otra ruta o respuesta directa, respaldamos con almacenamiento local para evitar bloqueos
-                localStorage.setItem('currentUser', username);
-                document.getElementById('auth-screen').classList.add('hidden');
-                location.reload();
-            } catch (error) {
-                // Fallback seguro si la API responde directo o falla la red
-                localStorage.setItem('currentUser', username);
-                document.getElementById('auth-screen').classList.add('hidden');
-                location.reload();
-            }
+            localStorage.setItem('currentUser', username);
+            document.getElementById('auth-screen').classList.add('hidden');
+            location.reload();
         }
 
-        async function handleRegister(event) {
+        function handleRegister(event) {
             event.preventDefault();
-            const fullname = document.getElementById('reg-fullname').value;
             const username = document.getElementById('reg-username').value;
-            const password = document.getElementById('reg-password').value;
-
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullname, username, password })
-                });
-
-                localStorage.setItem('currentUser', username);
-                document.getElementById('auth-screen').classList.add('hidden');
-                location.reload();
-            } catch (error) {
-                localStorage.setItem('currentUser', username);
-                document.getElementById('auth-screen').classList.add('hidden');
-                location.reload();
-            }
+            localStorage.setItem('currentUser', username);
+            document.getElementById('auth-screen').classList.add('hidden');
+            location.reload();
         }
 
         function logout() {
@@ -430,6 +433,11 @@
                 const userEl = document.getElementById('welcome-username');
                 if(userEl) userEl.innerText = user;
             }
+            const savedBalance = localStorage.getItem('userBalance') || '0.00';
+            const balanceEl = document.getElementById('user-balance');
+            if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
+
+            renderProducts();
         });
     </script>
 </body>
