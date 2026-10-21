@@ -151,7 +151,7 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Datos Bancarios -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
@@ -206,14 +206,36 @@
                             <label class="text-xs text-slate-400">Nuevo Precio</label>
                             <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar</button>
+                        <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar Precio</button>
+                    </div>
+                </div>
+
+                <!-- Modificar Imágenes y Títulos de Cuentas -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
+                        <i class="fa-solid fa-image"></i> Editar Tarjeta de Cuenta
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Producto</label>
+                            <select id="image-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white" onchange="loadProductDetailsToForm()"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Título Personalizado</label>
+                            <input type="text" id="edit-product-name" placeholder="Ej. Netflix premium mes" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">URL de Imagen o Banner</label>
+                            <input type="text" id="edit-product-image" placeholder="https://... o texto" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateProductVisuals()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar Tarjeta</button>
                     </div>
                 </div>
 
                 <!-- Cargar Stock -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
-                        <i class="fa-solid fa-box-archive"></i> Inventario
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-indigo-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-indigo-400 flex items-center gap-2">
+                        <i class="fa-solid fa-box-archive"></i> Inventario de Cuentas
                     </h3>
                     <div class="space-y-3">
                         <div>
@@ -224,7 +246,7 @@
                             <label class="text-xs text-slate-400">Credenciales</label>
                             <input type="text" id="stock-credentials" placeholder="correo : clave" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
-                        <button type="button" onclick="addStock()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
+                        <button type="button" onclick="addStock()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
                     </div>
                 </div>
             </div>
@@ -243,7 +265,7 @@
         </div>
     </div>
 
-    <!-- Modal Recarga con Botón de Copiar Datos -->
+    <!-- Modal Recarga -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
@@ -255,7 +277,6 @@
                     <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Administrador Streaming</span></p>
                 </div>
                 
-                <!-- BOTÓN PARA COPIAR DATOS BANCARIOS -->
                 <button type="button" onclick="copyBankDetails()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition text-xs shadow-lg shadow-blue-600/30">
                     <i class="fa-solid fa-copy"></i> Copiar Datos Bancarios
                 </button>
@@ -285,16 +306,16 @@
         const database = firebase.database();
 
         let defaultProducts = [
-            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, duration: 'Duración: 30 días' },
-            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, duration: 'Duración: 30 días' },
-            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, duration: 'Duración: 30 días' },
-            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, duration: 'Duración: 30 días' },
-            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, duration: 'Duración: 30 días' },
-            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, duration: 'Duración: 30 días' },
-            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, duration: 'Duración: 30 días' },
-            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, duration: 'Duración: 30 días' },
-            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, duration: 'Duración: 30 días' },
-            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, duration: 'Duración: 30 días' }
+            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, duration: 'Duración: 30 días', image: 'NETFLIX' },
+            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, duration: 'Duración: 30 días', image: 'NETFLIX' },
+            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, duration: 'Duración: 30 días', image: 'DISNEY+' },
+            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, duration: 'Duración: 30 días', image: 'ViX' },
+            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, duration: 'Duración: 30 días', image: 'MAX' },
+            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, duration: 'Duración: 30 días', image: 'PRIME' },
+            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, duration: 'Duración: 30 días', image: 'SPOTIFY' },
+            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, duration: 'Duración: 30 días', image: 'YOUTUBE' },
+            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, duration: 'Duración: 30 días', image: 'CANVA' },
+            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, duration: 'Duración: 30 días', image: 'IPTV' }
         ];
 
         function getProducts() {
@@ -333,7 +354,7 @@
                         </div>
 
                         <div class="h-36 bg-gradient-to-b from-black/60 to-slate-950 flex items-center justify-center relative border-b border-purple-900/20">
-                            <h3 class="text-2xl font-black tracking-widest text-red-600 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)]">NETFLIX</h3>
+                            <h3 class="text-2xl font-black tracking-widest text-red-500 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)]">${p.image || 'NETFLIX'}</h3>
                         </div>
 
                         <div class="p-6 space-y-4">
@@ -352,15 +373,42 @@
                 `;
             }).join('');
 
-            ['price-product-id', 'stock-product-id'].forEach(selId => {
+            ['price-product-id', 'stock-product-id', 'image-product-id'].forEach(selId => {
                 const sel = document.getElementById(selId);
                 if (sel) {
                     sel.innerHTML = currentProducts.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
                 }
             });
+            loadProductDetailsToForm();
         }
 
-        // FUNCIÓN PARA COPIAR LOS DATOS BANCARIOS
+        function loadProductDetailsToForm() {
+            const prodId = document.getElementById('image-product-id').value;
+            const currentProducts = getProducts();
+            const p = currentProducts.find(item => item.id === prodId);
+            if (p) {
+                document.getElementById('edit-product-name').value = p.name;
+                document.getElementById('edit-product-image').value = p.image || '';
+            }
+        }
+
+        function updateProductVisuals() {
+            const prodId = document.getElementById('image-product-id').value;
+            const newName = document.getElementById('edit-product-name').value.trim();
+            const newImage = document.getElementById('edit-product-image').value.trim();
+
+            let currentProducts = getProducts();
+            const index = currentProducts.findIndex(p => p.id === prodId);
+            if (index !== -1) {
+                if(newName) currentProducts[index].name = newName;
+                if(newImage) currentProducts[index].image = newImage;
+
+                localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
+                renderProducts();
+                alert('¡Tarjeta de cuenta actualizada con éxito!');
+            }
+        }
+
         function copyBankDetails() {
             const bank = document.getElementById('bank-name-display').innerText;
             const clabe = document.getElementById('bank-clabe-display').innerText;
@@ -400,6 +448,7 @@
 
         function listenUserData(clientID) {
             const clientRef = database.ref('clients/' + clientID);
+            const currentUsername = localStorage.getItem('currentUser') || 'Cliente';
             
             clientRef.on('value', (snapshot) => {
                 const data = snapshot.val() || {};
@@ -410,6 +459,10 @@
                 if (data.purchases) {
                     let html = '';
                     Object.values(data.purchases).forEach(item => {
+                        // Mensaje de soporte actualizado con Nombre de usuario, ID, Servicio, Fecha y Cuenta que falla
+                        const supportMsg = `Hola, soy ${currentUsername} (ID: ${clientID}). Tengo un problema con mi cuenta de ${item.productName} comprada el ${item.purchaseDate}. Las credenciales son: ${item.credentials}`;
+                        const encodedMsg = encodeURIComponent(supportMsg);
+
                         html += `
                             <tr class="hover:bg-purple-950/20 transition">
                                 <td class="p-3 font-bold text-white">${item.productName}</td>
@@ -418,7 +471,7 @@
                                 <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
                                 <td class="p-3 text-xs space-y-1">
                                     <div class="text-amber-400 font-bold">${item.expireDate}</div>
-                                    <a href="https://wa.me/529241955327?text=Hola,%20tengo%20una%20duda%20con%20mi%20cuenta%20de%20${encodeURIComponent(item.productName)}%20comprada%20el%20${encodeURIComponent(item.purchaseDate)}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
+                                    <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
                                         <i class="fa-brands fa-whatsapp"></i> Soporte
                                     </a>
                                 </td>
