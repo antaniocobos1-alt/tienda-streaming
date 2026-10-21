@@ -14,6 +14,9 @@
     <style>
         body {
             background: radial-gradient(circle at top, #1e1035 0%, #090514 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         .glow-card {
             box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
@@ -23,7 +26,7 @@
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen font-sans selection:bg-pink-500 selection:text-white">
+<body id="store-body" class="text-slate-100 min-h-screen font-sans selection:bg-pink-500 selection:text-white pb-20">
 
     <!-- Pantalla Auth -->
     <div id="auth-screen" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
@@ -74,7 +77,7 @@
         </div>
     </div>
 
-    <!-- Navegación -->
+    <!-- Navegación Superior -->
     <nav class="bg-slate-950/80 backdrop-blur-xl border-b border-purple-900/30 p-4 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
             <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-red-500 via-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
@@ -91,6 +94,13 @@
                 <div class="bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-500/40 text-xs sm:text-sm font-bold text-emerald-400">
                     Saldo: <span id="user-balance" class="text-emerald-300">$0.00</span> MXN
                 </div>
+
+                <!-- Botón Carrito Header -->
+                <button type="button" onclick="openCartModal()" class="relative bg-purple-900/40 hover:bg-purple-800/50 text-pink-300 font-bold p-2.5 rounded-xl transition border border-purple-500/30" title="Ver Carrito">
+                    <i class="fa-solid fa-cart-shopping text-base"></i>
+                    <span id="cart-badge-header" class="absolute -top-1 -right-1 bg-pink-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black shadow-md hidden">0</span>
+                </button>
+
                 <button type="button" onclick="openAdminModal()" class="text-xs bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-90 text-white font-bold px-3 py-2 rounded-xl transition shadow-lg shadow-amber-500/20">
                     <i class="fa-solid fa-lock"></i> Admin
                 </button>
@@ -100,6 +110,12 @@
             </div>
         </div>
     </nav>
+
+    <!-- Botón Flotante Carrito (Inferior Derecha) -->
+    <button type="button" onclick="openCartModal()" class="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition flex items-center justify-center glow-card">
+        <i class="fa-solid fa-cart-shopping text-xl"></i>
+        <span id="cart-badge-float" class="absolute -top-1 -right-1 bg-emerald-500 text-slate-950 text-xs w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-slate-950 shadow-md hidden">0</span>
+    </button>
 
     <!-- Contenido Principal -->
     <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
@@ -210,25 +226,18 @@
                     </div>
                 </div>
 
-                <!-- Modificar Imágenes desde la Galería -->
+                <!-- Cambiar Fondo de la Tienda -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
-                        <i class="fa-solid fa-image"></i> Subir Imagen desde Galería
+                        <i class="fa-solid fa-palette"></i> Cambiar Fondo de la Tienda
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs text-slate-400">Producto</label>
-                            <select id="image-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white" onchange="loadProductDetailsToForm()"></select>
+                            <label class="text-xs text-slate-400">Seleccionar Imagen de Fondo</label>
+                            <input type="file" id="store-bg-file" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs mt-1 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-500">
                         </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Título Personalizado</label>
-                            <input type="text" id="edit-product-name" placeholder="Ej. Netflix premium mes" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Seleccionar Imagen de la Galería</label>
-                            <input type="file" id="edit-product-file" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs mt-1 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-500">
-                        </div>
-                        <button type="button" onclick="updateProductVisuals()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Imagen y Título</button>
+                        <button type="button" onclick="updateStoreBackground()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Aplicar Fondo</button>
+                        <button type="button" onclick="resetStoreBackground()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs transition">Restaurar Fondo Predeterminado</button>
                     </div>
                 </div>
 
@@ -252,6 +261,37 @@
             </div>
         </section>
     </main>
+
+    <!-- Modal del Carrito de Compras -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
+        <div class="bg-slate-900 border border-purple-500/40 rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-2xl glow-card max-h-[85vh] flex flex-col justify-between">
+            <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
+                <h3 class="text-xl font-bold text-pink-400 flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping"></i> Mi Carrito de Compras
+                </h3>
+                <button type="button" onclick="closeCartModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="cart-items-container" class="overflow-y-auto space-y-3 my-2 pr-1 max-h-[50vh]"></div>
+
+            <div class="border-t border-purple-900/40 pt-4 space-y-3">
+                <div class="flex justify-between items-center text-sm font-bold">
+                    <span class="text-slate-400">Total a Pagar:</span>
+                    <span id="cart-total-price" class="text-2xl text-emerald-400 font-extrabold">$0.00 MXN</span>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="clearCart()" class="w-1/3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-xs transition">
+                        Vaciar
+                    </button>
+                    <button type="button" onclick="checkoutCart()" class="w-2/3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-teal-600/30">
+                        Pagar con Saldo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Admin PIN -->
     <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
@@ -305,17 +345,19 @@
         }
         const database = firebase.database();
 
+        let cart = [];
+
         let defaultProducts = [
-            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, duration: 'Duración: 30 días', image: '' },
-            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, duration: 'Duración: 30 días', image: '' },
-            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, duration: 'Duración: 30 días', image: '' },
-            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, duration: 'Duración: 30 días', image: '' },
-            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, duration: 'Duración: 30 días', image: '' },
-            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, duration: 'Duración: 30 días', image: '' },
-            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, duration: 'Duración: 30 días', image: '' },
-            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, duration: 'Duración: 30 días', image: '' },
-            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, duration: 'Duración: 30 días', image: '' },
-            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, duration: 'Duración: 30 días', image: '' }
+            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, duration: 'Duración: 30 días' },
+            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, duration: 'Duración: 30 días' },
+            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, duration: 'Duración: 30 días' },
+            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, duration: 'Duración: 30 días' },
+            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, duration: 'Duración: 30 días' },
+            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, duration: 'Duración: 30 días' },
+            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, duration: 'Duración: 30 días' },
+            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, duration: 'Duración: 30 días' },
+            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, duration: 'Duración: 30 días' },
+            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, duration: 'Duración: 30 días' }
         ];
 
         function getProducts() {
@@ -344,22 +386,17 @@
                 const prodStock = stockData[p.id] || [];
                 const hasStock = prodStock.length > 0;
 
-                // Si se subió imagen de galería se muestra como fondo, si no, se muestra el título en texto
-                const imageContent = p.image 
-                    ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${p.image}')"></div>`
-                    : `<h3 class="text-2xl font-black tracking-widest text-red-500 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)] z-10">${p.name.split(' ')[0]}</h3>`;
-
                 return `
                     <div class="bg-slate-900/90 border border-purple-900/40 rounded-3xl overflow-hidden shadow-2xl glow-card relative flex flex-col justify-between">
-                        <div class="absolute top-4 right-4 z-20">
+                        <div class="absolute top-4 right-4 z-10">
                             ${hasStock 
                                 ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">Disponible (${prodStock.length})</span>`
                                 : `<span class="bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1 rounded-full font-bold">Agotado</span>`
                             }
                         </div>
 
-                        <div class="h-36 bg-gradient-to-b from-black/60 to-slate-950 flex items-center justify-center relative border-b border-purple-900/20 overflow-hidden">
-                            ${imageContent}
+                        <div class="h-36 bg-gradient-to-b from-black/60 to-slate-950 flex items-center justify-center relative border-b border-purple-900/20">
+                            <h3 class="text-2xl font-black tracking-widest text-red-500 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)]">${p.name.split(' ')[0]}</h3>
                         </div>
 
                         <div class="p-6 space-y-4">
@@ -370,7 +407,9 @@
                             <p class="text-3xl font-black text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
                             
                             ${hasStock 
-                                ? `<button onclick="buyProduct('${p.id}', '${p.name}',${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-3 rounded-2xl text-sm transition shadow-lg shadow-purple-600/30">Comprar Cuenta</button>`
+                                ? `<button onclick="addToCart('${p.id}', '${p.name}',${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-3 rounded-2xl text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
+                                   </button>`
                                 : `<button disabled class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-2xl text-sm cursor-not-allowed">Sin Stock</button>`
                             }
                         </div>
@@ -378,50 +417,224 @@
                 `;
             }).join('');
 
-            ['price-product-id', 'stock-product-id', 'image-product-id'].forEach(selId => {
+            ['price-product-id', 'stock-product-id'].forEach(selId => {
                 const sel = document.getElementById(selId);
                 if (sel) {
-                    sel.innerHTML = currentProducts.map(prod => `<option value="${prod.id}">${prod.name} ($${prod.price})</option>`).join('');
+                    sel.innerHTML = currentProducts.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
                 }
             });
-            loadProductDetailsToForm();
         }
 
-        function loadProductDetailsToForm() {
-            const prodId = document.getElementById('image-product-id').value;
-            const currentProducts = getProducts();
-            const p = currentProducts.find(item => item.id === prodId);
-            if (p) {
-                document.getElementById('edit-product-name').value = p.name;
+        /* --- FUNCIONES DE CAMBIO DE FONDO --- */
+        function updateStoreBackground() {
+            const fileInput = document.getElementById('store-bg-file');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const bgDataUrl = e.target.result;
+                    localStorage.setItem('storeCustomBg', bgDataUrl);
+                    applyStoreBackground(bgDataUrl);
+                    alert('¡Fondo de la tienda actualizado con éxito!');
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                alert('Por favor selecciona una imagen.');
             }
         }
 
-        function updateProductVisuals() {
-            const prodId = document.getElementById('image-product-id').value;
-            const newName = document.getElementById('edit-product-name').value.trim();
-            const fileInput = document.getElementById('edit-product-file');
+        function applyStoreBackground(bgUrl) {
+            const bodyEl = document.getElementById('store-bg-body') || document.body;
+            if (bgUrl) {
+                bodyEl.style.backgroundImage = `linear-gradient(rgba(9, 5, 20, 0.85), rgba(30, 16, 53, 0.85)), url('${bgUrl}')`;
+            }
+        }
 
-            let currentProducts = getProducts();
-            const index = currentProducts.findIndex(p => p.id === prodId);
+        function resetStoreBackground() {
+            localStorage.removeItem('storeCustomBg');
+            const bodyEl = document.body;
+            bodyEl.style.backgroundImage = 'none';
+            alert('Fondo restaurado al predeterminado.');
+        }
 
-            if (index !== -1) {
-                if (newName) currentProducts[index].name = newName;
+        /* --- FUNCIONES DEL CARRITO --- */
+        function addToCart(productId, productName, price) {
+            const stockData = getStock();
+            const prodStock = stockData[productId] || [];
+            
+            const existingItem = cart.find(item => item.id === productId);
+            const currentQtyInCart = existingItem ? existingItem.qty : 0;
 
-                if (fileInput.files && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        currentProducts[index].image = e.target.result; // Guarda la imagen convertida
-                        localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
-                        renderProducts();
-                        alert('¡Imagen y tarjeta actualizadas con éxito!');
-                    };
-                    reader.readAsDataURL(fileInput.files[0]);
-                } else {
-                    localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
-                    renderProducts();
-                    alert('¡Título actualizado con éxito!');
+            if (currentQtyInCart + 1 > prodStock.length) {
+                alert(`Solo hay ${prodStock.length} cuentas disponibles de ${productName}.`);
+                return;
+            }
+
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ id: productId, name: productName, price: price, qty: 1 });
+            }
+
+            updateCartUI();
+            alert(`¡${productName} agregado al carrito! 🛒`);
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+            const badgeHeader = document.getElementById('cart-badge-header');
+            const badgeFloat = document.getElementById('cart-badge-float');
+
+            [badgeHeader, badgeFloat].forEach(badge => {
+                if (badge) {
+                    badge.innerText = totalItems;
+                    if (totalItems > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            });
+
+            renderCartItems();
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            const totalElement = document.getElementById('cart-total-price');
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-500 py-6">Tu carrito está vacío 🛒</p>`;
+                if (totalElement) totalElement.innerText = '$0.00 MXN';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+
+                return `
+                    <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-purple-900/40 flex items-center justify-between gap-3">
+                        <div class="space-y-0.5">
+                            <h4 class="font-bold text-sm text-white">${item.name}</h4>
+                            <p class="text-xs text-emerald-400 font-bold">$${item.price}.00 MXN c/u</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeCartQty('${item.id}', -1)" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center font-bold text-xs">-</button>
+                            <span class="font-mono text-pink-400 font-bold text-sm w-4 text-center">${item.qty}</span>
+                            <button onclick="changeCartQty('${item.id}', 1)" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center font-bold text-xs">+</button>
+                            <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 ml-2 p-1 text-xs" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (totalElement) totalElement.innerText = `$${total.toFixed(2)} MXN`;
+        }
+
+        function changeCartQty(productId, delta) {
+            const stockData = getStock();
+            const prodStock = stockData[productId] || [];
+            const item = cart.find(i => i.id === productId);
+
+            if (item) {
+                if (delta > 0 && item.qty + 1 > prodStock.length) {
+                    alert(`No hay más stock disponible de este producto.`);
+                    return;
+                }
+
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== productId);
                 }
             }
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+        }
+
+        function openCartModal() {
+            renderCartItems();
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function checkoutCart() {
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío.');
+                return;
+            }
+
+            const currentID = localStorage.getItem('currentClientID');
+            const clientRef = database.ref('clients/' + currentID);
+            const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+            clientRef.once('value').then((snapshot) => {
+                const data = snapshot.val() || {};
+                let currentBalance = data.balance || 0;
+
+                if (currentBalance < totalAmount) {
+                    alert(`Saldo insuficiente. Requieres $${totalAmount.toFixed(2)} MXN y tienes $${currentBalance.toFixed(2)} MXN.`);
+                    closeCartModal();
+                    openTopUpModal();
+                    return;
+                }
+
+                if (confirm(`¿Confirmar compra total por $${totalAmount.toFixed(2)} MXN?`)) {
+                    let stockData = getStock();
+                    let newPurchasesPromises = [];
+                    const now = new Date();
+                    const expire = new Date();
+                    expire.setDate(now.getDate() + 30);
+
+                    const purchaseDateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const expireDateStr = expire.toLocaleDateString();
+
+                    cart.forEach(item => {
+                        let prodStock = stockData[item.id] || [];
+                        for (let i = 0; i < item.qty; i++) {
+                            const assignedCredentials = prodStock.shift();
+                            const newPurchaseRef = clientRef.child('purchases').push();
+                            
+                            newPurchasesPromises.push(newPurchaseRef.set({
+                                productName: item.name,
+                                price: item.price,
+                                credentials: assignedCredentials,
+                                purchaseDate: purchaseDateStr,
+                                expireDate: expireDateStr
+                            }));
+                        }
+                        stockData[item.id] = prodStock;
+                    });
+
+                    const newBalance = currentBalance - totalAmount;
+
+                    Promise.all([
+                        clientRef.child('balance').set(newBalance),
+                        ...newPurchasesPromises
+                    ]).then(() => {
+                        localStorage.setItem('storeStock', JSON.stringify(stockData));
+                        alert('¡Compra realizada con éxito! Tus cuentas ya están listas abajo.');
+                        clearCart();
+                        closeCartModal();
+                        renderProducts();
+                    });
+                }
+            });
         }
 
         function copyBankDetails() {
@@ -499,60 +712,6 @@
             });
         }
 
-        function buyProduct(productId, productName, price) {
-            const currentID = localStorage.getItem('currentClientID');
-            const clientRef = database.ref('clients/' + currentID);
-            let stockData = getStock();
-            let prodStock = stockData[productId] || [];
-
-            if (prodStock.length === 0) {
-                alert('Lo sentimos, este producto se ha quedado sin stock.');
-                return;
-            }
-
-            clientRef.once('value').then((snapshot) => {
-                const data = snapshot.val() || {};
-                let currentBalance = data.balance || 0;
-
-                if (currentBalance < price) {
-                    alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
-                    openTopUpModal();
-                    return;
-                }
-
-                if (confirm(`¿Deseas comprar ${productName} por $${price} MXN?`)) {
-                    const assignedCredentials = prodStock.shift();
-                    stockData[productId] = prodStock;
-                    localStorage.setItem('storeStock', JSON.stringify(stockData));
-
-                    const now = new Date();
-                    const expire = new Date();
-                    expire.setDate(now.getDate() + 30);
-
-                    const purchaseDateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    const expireDateStr = expire.toLocaleDateString();
-
-                    const newBalance = currentBalance - price;
-                    const newPurchaseRef = clientRef.child('purchases').push();
-                    const purchaseData = {
-                        productName: productName,
-                        price: price,
-                        credentials: assignedCredentials,
-                        purchaseDate: purchaseDateStr,
-                        expireDate: expireDateStr
-                    };
-
-                    Promise.all([
-                        clientRef.child('balance').set(newBalance),
-                        newPurchaseRef.set(purchaseData)
-                    ]).then(() => {
-                        alert('¡Compra realizada con éxito! Tus credenciales ya aparecen en la tabla de abajo.');
-                        renderProducts();
-                    });
-                }
-            });
-        }
-
         function addStock() {
             const prodId = document.getElementById('stock-product-id').value;
             const creds = document.getElementById('stock-credentials').value.trim();
@@ -568,7 +727,7 @@
 
             localStorage.setItem('storeStock', JSON.stringify(stockData));
             document.getElementById('stock-credentials').value = '';
-            alert('¡Stock guardado correctamente en la tienda!');
+            alert('¡Stock guardado correctamente!');
             renderProducts();
         }
 
@@ -713,6 +872,11 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            const savedBg = localStorage.getItem('storeCustomBg');
+            if (savedBg) {
+                applyStoreBackground(savedBg);
+            }
+
             const user = localStorage.getItem('currentUser');
             let clientID = localStorage.getItem('currentClientID');
 
