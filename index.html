@@ -296,4 +296,21 @@
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
-            <div class
+            <div class="space-y-2 text-xs text-slate-300">
+                <p>1. Transfiere o deposita la cantidad que desees a la siguiente cuenta:</p>
+                <div id="topup-bank-details" class="bg-slate-950 p-3 rounded-xl border border-purple-900/30 font-mono space-y-1">
+                    <p>Banco: <span id="bank-name-display">Cargando...</span></p>
+                    <p>CLABE: <span id="bank-clabe-display">Cargando...</span></p>
+                    <p>Titular: <span id="bank-holder-display">Cargando...</span></p>
+                </div>
+                <p>2. Copia tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-0000</strong></p>
+                <p>3. Envía el comprobante de pago a tu proveedor indicando tu ID de cliente para que te reactive o acredite el saldo.</p>
+            </div>
+            <button type="button" onclick="closeTopUpModal()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition mt-4">
+                Entendido / Cerrar
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>
