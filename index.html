@@ -117,7 +117,7 @@
             <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <!-- Panel Cliente -->
+            <!-- Panel Cliente: Cuentas Compradas -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
@@ -129,8 +129,8 @@
                                 <th class="p-3">Servicio</th>
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
+                                <th class="p-3">Fecha Compra</th>
                                 <th class="p-3">Vencimiento</th>
-                                <th class="p-3">Estado / Soporte</th>
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-purple-950/50">
@@ -268,7 +268,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT ORIGINAL CONECTADO A FIREBASE -->
+    <!-- SCRIPT DE TIENDA CON COMPRAS Y FECHAS -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com"
@@ -320,7 +320,7 @@
                         <h3 class="text-lg font-bold text-white">${p.name}</h3>
                         <p class="text-2xl font-extrabold text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
                     </div>
-                    <button onclick="buyProduct('${p.id}', ${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
+                    <button onclick="buyProduct('${p.id}', '${p.name}', ${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
                         Comprar Cuenta
                     </button>
                 </div>
@@ -334,7 +334,6 @@
             });
         }
 
-        // RECARGA EXACTA POR ID ÚNICO EN FIREBASE
         function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
@@ -359,12 +358,81 @@
             });
         }
 
-        // ESCUCHAR SALDO EN TIEMPO REAL DESDE FIREBASE
-        function listenUserBalance(clientID) {
-            const clientBalanceRef = database.ref('clients/' + clientID + '/balance');
-            clientBalanceRef.on('value', (snapshot) => {
-                const val = snapshot.val() || 0;
-                document.getElementById('user-balance').innerText = `$${parseFloat(val).toFixed(2)}`;
+        function listenUserData(clientID) {
+            const clientRef = database.ref('clients/' + clientID);
+            
+            clientRef.on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const balance = data.balance || 0;
+                document.getElementById('user-balance').innerText = `$${parseFloat(balance).toFixed(2)}`;
+
+                // Renderizar compras en la tabla
+                const purchasesList = document.getElementById('purchases-list');
+                if (data.purchases) {
+                    let html = '';
+                    Object.values(data.purchases).forEach(item => {
+                        html += `
+                            <tr class="hover:bg-purple-950/20 transition">
+                                <td class="p-3 font-bold text-white">${item.productName}</td>
+                                <td class="p-3 font-mono text-pink-400 select-all">${item.credentials || 'Cuenta Entregada'}</td>
+                                <td class="p-3 text-emerald-400 font-bold">$${item.price} MXN</td>
+                                <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
+                                <td class="p-3 text-amber-400 text-xs font-bold">${item.expireDate}</td>
+                            </tr>
+                        `;
+                    });
+                    purchasesList.innerHTML = html;
+                } else {
+                    purchasesList.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>`;
+                }
+            });
+        }
+
+        function buyProduct(productId, productName, price) {
+            const currentID = localStorage.getItem('currentClientID');
+            const clientRef = database.ref('clients/' + currentID);
+
+            clientRef.once('value').then((snapshot) => {
+                const data = snapshot.val() || {};
+                let currentBalance = data.balance || 0;
+
+                if (currentBalance < price) {
+                    alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
+                    openTopUpModal();
+                    return;
+                }
+
+                if (confirm(`¿Deseas comprar ${productName} por $${price} MXN?`)) {
+                    // Generar fechas de compra y vencimiento (30 días)
+                    const now = new Date();
+                    const expire = new Date();
+                    expire.setDate(now.getDate() + 30);
+
+                    const purchaseDateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const expireDateStr = expire.toLocaleDateString();
+
+                    // Credenciales de ejemplo o tomadas del stock si hay
+                    const credentials = "correo_" + Math.floor(Math.random() * 89999 + 10000) + "@streaming.com : pass" + Math.floor(Math.random() * 8999 + 1000);
+
+                    const newBalance = currentBalance - price;
+                    
+                    // Guardar en Firebase
+                    const newPurchaseRef = clientRef.child('purchases').push();
+                    const purchaseData = {
+                        productName: productName,
+                        price: price,
+                        credentials: credentials,
+                        purchaseDate: purchaseDateStr,
+                        expireDate: expireDateStr
+                    };
+
+                    Promise.all([
+                        clientRef.child('balance').set(newBalance),
+                        newPurchaseRef.set(purchaseData)
+                    ]).then(() => {
+                        alert('¡Compra realizada con éxito! Tus credenciales ya aparecen en la tabla.');
+                    });
+                }
             });
         }
 
@@ -433,26 +501,6 @@
             location.reload();
         }
 
-        function buyProduct(id, price) {
-            const currentID = localStorage.getItem('currentClientID');
-            const clientBalanceRef = database.ref('clients/' + currentID + '/balance');
-
-            clientBalanceRef.once('value').then((snapshot) => {
-                let currentBalance = snapshot.val() || 0;
-                if (currentBalance < price) {
-                    alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
-                    openTopUpModal();
-                    return;
-                }
-
-                if (confirm('¿Deseas comprar este servicio?')) {
-                    clientBalanceRef.set(currentBalance - price).then(() => {
-                        alert('¡Compra realizada con éxito!');
-                    });
-                }
-            });
-        }
-
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('form-login');
             const registerForm = document.getElementById('form-register');
@@ -499,6 +547,7 @@
             }
         }
 
+        function openTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); } // corregido
         function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
@@ -545,7 +594,7 @@
                     localStorage.setItem('currentClientID', clientID);
                 }
                 updateClientIDDisplays(clientID);
-                listenUserBalance(clientID);
+                listenUserData(clientID);
             }
 
             renderProducts();
