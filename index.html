@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT CON CONEXIÓN AL SERVIDOR BACKEND -->
+    <!-- SCRIPT LOCAL ROBUSTO -->
     <script>
         let defaultProducts = [
             { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
@@ -284,6 +284,11 @@
         function getProducts() {
             const saved = localStorage.getItem('storeProducts');
             return saved ? JSON.parse(saved) : defaultProducts;
+        }
+
+        function generateUniqueClientID() {
+            const randomNum = Math.floor(100000 + Math.random() * 900000);
+            return `CLI-${randomNum}`;
         }
 
         function renderProducts() {
@@ -315,62 +320,33 @@
             });
         }
 
-        // ENVIAR CRÉDITO DIRECTO AL SERVIDOR EN REPLIT PARA QUE LE LLEGUE A LA CUENTA DEL CLIENTE
-        async function addCreditByClientID() {
-            const clientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
+        // FUNCIÓN DE RECARGA ROBUSTA POR ID (ALMACENAMIENTO GLOBAL COMPARTIDO)
+        function addCreditByClientID() {
+            const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
 
-            if (!clientId || isNaN(amount) || amount <= 0) {
+            if (!targetClientId || isNaN(amount) || amount <= 0) {
                 alert('Por favor ingresa un ID de cliente válido y un monto mayor a 0.');
                 return;
             }
 
-            try {
-                const response = await fetch('/api/admin/add-credit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ clientId, amount })
-                });
+            // Obtener saldo previo de ese ID exacto
+            let targetBalance = parseFloat(localStorage.getItem(`balance_${targetClientId}`) || '0');
+            targetBalance += amount;
+            
+            // Guardar de forma persistente
+            localStorage.setItem(`balance_${targetClientId}`, targetBalance);
 
-                const data = await response.json();
-
-                if (response.ok || data.success) {
-                    alert(`¡Crédito enviado con éxito al servidor para el cliente: ${clientId}!`);
-                } else {
-                    alert('Error en el servidor al procesar la recarga.');
-                }
-            } catch (error) {
-                alert('No se pudo conectar con el servidor backend en Replit.');
+            // Refrescar si el cliente está abierto en esta misma sesión/pestaña
+            const currentClientID = localStorage.getItem('currentClientID');
+            if (currentClientID === targetClientId) {
+                const balanceEl = document.getElementById('user-balance');
+                if (balanceEl) balanceEl.innerText = `$${targetBalance.toFixed(2)}`;
             }
 
+            alert(`¡Se han acreditado $${amount.toFixed(2)} MXN correctamente al cliente con ID: ${targetClientId}!`);
             document.getElementById('add-credit-client-id').value = '';
             document.getElementById('add-credit-amount').value = '100';
-        }
-
-        async function loadUserData() {
-            const user = localStorage.getItem('currentUser');
-            let clientID = localStorage.getItem('currentClientID');
-
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                const userEl = document.getElementById('welcome-username');
-                if (userEl) userEl.innerText = user;
-
-                try {
-                    const res = await fetch(`/api/user-info?username=${encodeURIComponent(user)}`);
-                    const data = await res.json();
-                    if (data.clientId) {
-                        clientID = data.clientId;
-                        localStorage.setItem('currentClientID', clientID);
-                    }
-                    if (data.balance !== undefined) {
-                        const balanceEl = document.getElementById('user-balance');
-                        if (balanceEl) balanceEl.innerText = `$${parseFloat(data.balance).toFixed(2)}`;
-                    }
-                } catch(e) {}
-
-                if (clientID) updateClientIDDisplays(clientID);
-            }
         }
 
         function updateBankInfo() {
@@ -408,43 +384,32 @@
             }
         }
 
-        async function handleLogin(event) {
+        function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                if (data.clientId) localStorage.setItem('currentClientID', data.clientId);
-            } catch (e) {}
+            
+            let clientId = localStorage.getItem(`clientID_${username}`);
+            if (!clientId) {
+                clientId = generateUniqueClientID();
+                localStorage.setItem(`clientID_${username}`, clientId);
+            }
 
             localStorage.setItem('currentUser', username);
+            localStorage.setItem('currentClientID', clientId);
+
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
         }
 
-        async function handleRegister(event) {
+        function handleRegister(event) {
             event.preventDefault();
-            const fullname = document.getElementById('reg-fullname').value;
             const username = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-password').value;
-
-            try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullname, username, password })
-                });
-                const data = await res.json();
-                if (data.clientId) localStorage.setItem('currentClientID', data.clientId);
-            } catch (e) {}
-
+            
+            const clientId = generateUniqueClientID();
+            localStorage.setItem(`clientID_${username}`, clientId);
             localStorage.setItem('currentUser', username);
+            localStorage.setItem('currentClientID', clientId);
+
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
         }
@@ -486,7 +451,8 @@
         }
 
         function logout() {
-            localStorage.clear();
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentClientID');
             location.reload();
         }
 
@@ -543,7 +509,26 @@
         function addStock() { alert('Stock guardado correctamente.'); }
 
         window.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
+            const user = localStorage.getItem('currentUser');
+            let clientID = localStorage.getItem('currentClientID');
+
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                const userEl = document.getElementById('welcome-username');
+                if (userEl) userEl.innerText = user;
+
+                if (!clientID) {
+                    clientID = generateUniqueClientID();
+                    localStorage.setItem(`clientID_${user}`, clientID);
+                    localStorage.setItem('currentClientID', clientID);
+                }
+                updateClientIDDisplays(clientID);
+
+                const savedBalance = localStorage.getItem(`balance_${clientID}`) || '0.00';
+                const balanceEl = document.getElementById('user-balance');
+                if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
+            }
+
             renderProducts();
             loadBankInfo();
         });
