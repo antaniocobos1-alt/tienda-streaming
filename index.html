@@ -113,7 +113,7 @@
                 <i class="fa-solid fa-wallet"></i> Recargar Saldo
             </button>
 
-            <!-- Catálogo de productos con diseño original -->
+            <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 gap-6" id="products-grid"></div>
 
             <!-- Panel Cliente: Mis Cuentas Compradas -->
@@ -243,7 +243,7 @@
         </div>
     </div>
 
-    <!-- Modal Recarga -->
+    <!-- Modal Recarga con Botón de Copiar Datos -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
@@ -254,6 +254,12 @@
                     <p>CLABE: <span id="bank-clabe-display" class="text-white font-bold">123456789012345678</span></p>
                     <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Administrador Streaming</span></p>
                 </div>
+                
+                <!-- BOTÓN PARA COPIAR DATOS BANCARIOS -->
+                <button type="button" onclick="copyBankDetails()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition text-xs shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-copy"></i> Copiar Datos Bancarios
+                </button>
+
                 <p>2. Tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono text-sm">CLI-0000</strong></p>
                 <p>3. Envía tu comprobante de pago con tu ID por WhatsApp al número <strong class="text-white">9241955327</strong> para acreditar tu saldo al instante:</p>
                 
@@ -267,7 +273,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT CON DISEÑO ORIGINAL DE TARJETAS Y STOCK -->
+    <!-- SCRIPT -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com"
@@ -298,7 +304,7 @@
 
         function getStock() {
             const saved = localStorage.getItem('storeStock');
-            return saved ? JSON.parse(saved) : {}; // { productId: ["cred1", "cred2"] }
+            return saved ? JSON.parse(saved) : {};
         }
 
         function generateUniqueClientID() {
@@ -319,7 +325,6 @@
 
                 return `
                     <div class="bg-slate-900/90 border border-purple-900/40 rounded-3xl overflow-hidden shadow-2xl glow-card relative flex flex-col justify-between">
-                        <!-- Insignia Agotado / Stock -->
                         <div class="absolute top-4 right-4 z-10">
                             ${hasStock 
                                 ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">Disponible (${prodStock.length})</span>`
@@ -327,12 +332,10 @@
                             }
                         </div>
 
-                        <!-- Imagen o Banner de la tarjeta -->
                         <div class="h-36 bg-gradient-to-b from-black/60 to-slate-950 flex items-center justify-center relative border-b border-purple-900/20">
                             <h3 class="text-2xl font-black tracking-widest text-red-600 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)]">NETFLIX</h3>
                         </div>
 
-                        <!-- Información -->
                         <div class="p-6 space-y-4">
                             <div class="space-y-1">
                                 <h3 class="text-lg font-bold text-white">${p.name}</h3>
@@ -354,6 +357,20 @@
                 if (sel) {
                     sel.innerHTML = currentProducts.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
                 }
+            });
+        }
+
+        // FUNCIÓN PARA COPIAR LOS DATOS BANCARIOS
+        function copyBankDetails() {
+            const bank = document.getElementById('bank-name-display').innerText;
+            const clabe = document.getElementById('bank-clabe-display').innerText;
+            const holder = document.getElementById('bank-holder-display').innerText;
+
+            const textToCopy = `Banco: ${bank}\nCLABE: ${clabe}\nTitular: ${holder}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('¡Datos bancarios copiados al portapapeles!');
+            }).catch(err => {
+                alert('Error al copiar los datos.');
             });
         }
 
@@ -437,7 +454,6 @@
                 }
 
                 if (confirm(`¿Deseas comprar ${productName} por $${price} MXN?`)) {
-                    // Tomar la primera credencial del stock
                     const assignedCredentials = prodStock.shift();
                     stockData[productId] = prodStock;
                     localStorage.setItem('storeStock', JSON.stringify(stockData));
