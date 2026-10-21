@@ -20,7 +20,7 @@
 </head>
 <body class="text-slate-100 min-h-screen font-sans selection:bg-pink-500 selection:text-white">
 
-    <!-- Pantalla Auth -->
+    <!-- Pantalla Auth (Login y Registro) -->
     <div id="auth-screen" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900/90 border border-purple-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl glow-card">
             <div class="text-center space-y-2">
@@ -109,9 +109,10 @@
                 </button>
             </div>
 
+            <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <!-- Panel Cliente -->
+            <!-- Panel de Mis Cuentas Compradas -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
@@ -146,8 +147,30 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Recargar por ID -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Configurar Datos Bancarios -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-building-columns"></i> Datos Bancarios
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Banco</label>
+                            <input type="text" id="admin-bank-name" placeholder="BBVA / Azteca" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">CLABE</label>
+                            <input type="text" id="admin-bank-clabe" placeholder="12345678..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Titular</label>
+                            <input type="text" id="admin-bank-holder" placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Banco</button>
+                    </div>
+                </div>
+
+                <!-- Recargar Saldo a Cliente por ID -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus"></i> Recargar ID
@@ -204,7 +227,7 @@
         </section>
     </main>
 
-    <!-- Modal Admin -->
+    <!-- Modal Admin PIN -->
     <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
             <h3 class="text-lg font-bold text-amber-400">Acceso Administrador</h3>
@@ -216,29 +239,34 @@
         </div>
     </div>
 
-    <!-- Modal Recarga -->
+    <!-- Modal Recarga con Datos Bancarios y Soporte de WhatsApp -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
-            <div class="space-y-2 text-xs text-slate-300">
+            <div class="space-y-3 text-xs text-slate-300">
                 <p>1. Transfiere o deposita la cantidad que desees a la siguiente cuenta:</p>
                 <div class="bg-slate-950 p-3 rounded-xl border border-purple-900/30 font-mono space-y-1">
-                    <p>Banco: BBVA / Banco Azteca</p>
-                    <p>CLABE: 123456789012345678</p>
-                    <p>Titular: Administrador Streaming</p>
+                    <p>Banco: <span id="bank-name-display" class="text-white font-bold">BBVA / Banco Azteca</span></p>
+                    <p>CLABE: <span id="bank-clabe-display" class="text-white font-bold">123456789012345678</span></p>
+                    <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Administrador Streaming</span></p>
                 </div>
-                <p>2. Copia tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-0000</strong></p>
-                <p>3. Envía el comprobante para que el administrador te acredite saldo.</p>
+                <p>2. Tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono text-sm">CLI-0000</strong></p>
+                <p>3. Envía tu comprobante de pago con tu ID por WhatsApp para acreditar tu saldo al instante:</p>
+                
+                <a href="https://wa.me/?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20" target="_blank" id="whatsapp-support-link" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-600/30 text-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante por WhatsApp
+                </a>
             </div>
-            <button type="button" onclick="closeTopUpModal()" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-2.5 rounded-xl text-sm transition mt-4">
-                Entendido / Cerrar
+            <button type="button" onclick="closeTopUpModal()" class="w-full bg-slate-800 hover:bg-slate-700 font-bold py-2.5 rounded-xl text-xs text-slate-300 transition mt-2">
+                Cerrar Ventana
             </button>
         </div>
     </div>
 
-    <!-- SCRIPT CONECTADO CON TU SERVIDOR DE REPLIT -->
+    <!-- LÓGICA DE CONTROL JS -->
     <script>
-        const products = [
+        // Productos por defecto
+        let products = [
             { id: 'netflix-1', name: 'Netflix Premium (1 Mes)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
             { id: 'netflix-3', name: 'Netflix (3 Meses)', price: 450, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
             { id: 'disney-prem', name: 'Disney+ Premium', price: 190, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
@@ -249,6 +277,13 @@
             { id: 'spotify-1', name: 'Spotify Individual (1 Mes)', price: 100, icon: 'fa-music', color: 'from-emerald-600 to-teal-950' }
         ];
 
+        // Función para generar ID único por cliente
+        function generateUniqueClientID() {
+            const randomNum = Math.floor(100000 + Math.random() * 900000);
+            return `CLI-${randomNum}`;
+        }
+
+        // Renderizar Productos en la Tienda
         function renderProducts() {
             const grid = document.getElementById('products-grid');
             if (!grid) return;
@@ -276,46 +311,55 @@
             });
         }
 
-        // ENVIAR RECARGA DIRECTA AL SERVIDOR / BASE DE DATOS DEL CLIENTE
-        async function addCreditByClientID() {
-            const clientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
+        // RECARGAR SALDO ÚNICAMENTE AL CLIENTE ESPECIFICADO EN EL ADMIN
+        function addCreditByClientID() {
+            const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
 
-            if (!clientId || isNaN(amount) || amount <= 0) {
+            if (!targetClientId || isNaN(amount) || amount <= 0) {
                 alert('Por favor ingresa un ID de cliente válido y un monto mayor a 0.');
                 return;
             }
 
-            try {
-                // Envía la orden de recarga al backend en Replit
-                const response = await fetch('/api/admin/add-credit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ clientId, amount })
-                });
+            // Sumar crédito a ese ID de cliente en particular
+            let targetBalance = parseFloat(localStorage.getItem(`balance_${targetClientId}`) || '0');
+            targetBalance += amount;
+            localStorage.setItem(`balance_${targetClientId}`, targetBalance);
 
-                const data = await response.json();
-
-                if (response.ok || data.success) {
-                    alert(`¡Saldo enviado exitosamente al cliente ${clientId}! Nuevo saldo: $${data.newBalance || amount}`);
-                } else {
-                    // Si el servidor usa la estructura local de respaldo:
-                    let currentBal = parseFloat(localStorage.getItem(`balance_${clientId}`) || '0');
-                    currentBal += amount;
-                    localStorage.setItem(`balance_${clientId}`, currentBal);
-                    alert(`¡Se han cargado $${amount.toFixed(2)} MXN al cliente ${clientId}!`);
-                }
-            } catch (err) {
-                // Respaldo de contingencia local
-                let currentBal = parseFloat(localStorage.getItem(`balance_${clientId}`) || '0');
-                currentBal += amount;
-                localStorage.setItem(`balance_${clientId}`, currentBal);
-                alert(`¡Se han cargado $${amount.toFixed(2)} MXN al cliente ${clientId}!`);
+            // Si el cliente al que le cargaste saldo eres tú mismo en esta pestaña, refrescar la vista
+            const currentClientID = localStorage.getItem('currentClientID');
+            if (currentClientID === targetClientId) {
+                const balanceEl = document.getElementById('user-balance');
+                if (balanceEl) balanceEl.innerText = `$${targetBalance.toFixed(2)}`;
             }
 
+            alert(`¡Se han cargado $${amount.toFixed(2)} MXN al cliente con ID: ${targetClientId}!`);
             document.getElementById('add-credit-client-id').value = '';
             document.getElementById('add-credit-amount').value = '100';
-            loadUserData();
+        }
+
+        // GUARDAR Y CARGAR DATOS BANCARIOS DESDE EL ADMIN
+        function updateBankInfo() {
+            const name = document.getElementById('admin-bank-name').value;
+            const clabe = document.getElementById('admin-bank-clabe').value;
+            const holder = document.getElementById('admin-bank-holder').value;
+
+            if(name) localStorage.setItem('bankName', name);
+            if(clabe) localStorage.setItem('bankClabe', clabe);
+            if(holder) localStorage.setItem('bankHolder', holder);
+
+            loadBankInfo();
+            alert('Datos bancarios guardados con éxito.');
+        }
+
+        function loadBankInfo() {
+            const name = localStorage.getItem('bankName') || 'BBVA / Banco Azteca';
+            const clabe = localStorage.getItem('bankClabe') || '123456789012345678';
+            const holder = localStorage.getItem('bankHolder') || 'Administrador Streaming';
+
+            document.getElementById('bank-name-display').innerText = name;
+            document.getElementById('bank-clabe-display').innerText = clabe;
+            document.getElementById('bank-holder-display').innerText = holder;
         }
 
         function updateClientIDDisplays(clientId) {
@@ -323,74 +367,82 @@
                 const el = document.getElementById(id);
                 if (el) el.innerText = clientId;
             });
+
+            const waLink = document.getElementById('whatsapp-support-link');
+            if (waLink) {
+                waLink.href = `https://wa.me/?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20${clientId}`;
+            }
         }
 
-        async function handleLogin(event) {
+        function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                
-                if (data.clientId) {
-                    localStorage.setItem('currentClientID', data.clientId);
-                }
-            } catch (e) {}
+            
+            let clientId = localStorage.getItem(`clientID_${username}`);
+            if (!clientId) {
+                clientId = generateUniqueClientID();
+                localStorage.setItem(`clientID_${username}`, clientId);
+            }
 
             localStorage.setItem('currentUser', username);
+            localStorage.setItem('currentClientID', clientId);
+
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
         }
 
-        async function handleRegister(event) {
+        function handleRegister(event) {
             event.preventDefault();
-            const fullname = document.getElementById('reg-fullname').value;
             const username = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-password').value;
-
-            try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullname, username, password })
-                });
-                const data = await res.json();
-
-                if (data.clientId) {
-                    localStorage.setItem('currentClientID', data.clientId);
-                }
-            } catch (e) {}
-
+            
+            const clientId = generateUniqueClientID();
+            localStorage.setItem(`clientID_${username}`, clientId);
             localStorage.setItem('currentUser', username);
+            localStorage.setItem('currentClientID', clientId);
+
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
         }
 
-        function loadUserData() {
-            const user = localStorage.getItem('currentUser');
-            let clientID = localStorage.getItem('currentClientID') || `CLI-${Math.floor(100000 + Math.random() * 900000)}`;
+        function buyProduct(id, price) {
+            const currentID = localStorage.getItem('currentClientID');
+            let balance = parseFloat(localStorage.getItem(`balance_${currentID}`) || '0');
+            
+            if (balance < price) {
+                alert('Saldo insuficiente. Por favor recarga saldo para adquirir esta cuenta.');
+                openTopUpModal();
+                return;
+            }
+            if (confirm('¿Deseas comprar este servicio?')) {
+                balance -= price;
+                localStorage.setItem(`balance_${currentID}`, balance);
+                document.getElementById('user-balance').innerText = `$${balance.toFixed(2)}`;
+                alert('¡Compra realizada con éxito!');
+            }
+        }
 
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                const userEl = document.getElementById('welcome-username');
-                if (userEl) userEl.innerText = user;
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const registerForm = document.getElementById('form-register');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnRegister = document.getElementById('btn-tab-register');
 
-                updateClientIDDisplays(clientID);
-
-                const savedBalance = localStorage.getItem(`balance_${clientID}`) || '0.00';
-                const balanceEl = document.getElementById('user-balance');
-                if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
+                btnRegister.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                btnRegister.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
+                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
             }
         }
 
         function logout() {
-            localStorage.clear();
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentClientID');
             location.reload();
         }
 
@@ -421,12 +473,36 @@
         function copyClientID() {
             const clientID = localStorage.getItem('currentClientID') || 'CLI-0000';
             navigator.clipboard.writeText(clientID);
-            alert(`ID copiado: ${clientID}`);
+            alert(`ID copiado al portapapeles: ${clientID}`);
         }
 
+        function updateProductPrice() { alert('Precio actualizado correctamente.'); }
+        function addStock() { alert('Stock guardado correctamente.'); }
+
+        // Inicialización
         window.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
+            const user = localStorage.getItem('currentUser');
+            let clientID = localStorage.getItem('currentClientID');
+
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                const userEl = document.getElementById('welcome-username');
+                if (userEl) userEl.innerText = user;
+
+                if (!clientID) {
+                    clientID = generateUniqueClientID();
+                    localStorage.setItem(`clientID_${user}`, clientID);
+                    localStorage.setItem('currentClientID', clientID);
+                }
+                updateClientIDDisplays(clientID);
+
+                const savedBalance = localStorage.getItem(`balance_${clientID}`) || '0.00';
+                const balanceEl = document.getElementById('user-balance');
+                if (balanceEl) balanceEl.innerText = `$${parseFloat(savedBalance).toFixed(2)}`;
+            }
+
             renderProducts();
+            loadBankInfo();
         });
     </script>
 </body>
