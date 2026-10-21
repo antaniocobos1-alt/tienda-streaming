@@ -20,7 +20,7 @@
 </head>
 <body class="text-slate-100 min-h-screen font-sans selection:bg-pink-500 selection:text-white">
 
-    <!-- Pantalla Auth (Login y Registro) -->
+    <!-- Pantalla Auth -->
     <div id="auth-screen" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900/90 border border-purple-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl glow-card">
             <div class="text-center space-y-2">
@@ -239,7 +239,7 @@
         </div>
     </div>
 
-    <!-- Modal Recarga -->
+    <!-- Modal Recarga con Soporte de WhatsApp -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
@@ -251,9 +251,9 @@
                     <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Administrador Streaming</span></p>
                 </div>
                 <p>2. Tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono text-sm">CLI-0000</strong></p>
-                <p>3. Envía tu comprobante de pago con tu ID por WhatsApp para acreditar tu saldo al instante:</p>
+                <p>3. Envía tu comprobante de pago con tu ID por WhatsApp al número <strong class="text-white">9241955327</strong> para acreditar tu saldo al instante:</p>
                 
-                <a href="https://wa.me/?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20" target="_blank" id="whatsapp-support-link" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-600/30 text-sm">
+                <a href="https://wa.me/529241955327?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20" target="_blank" id="whatsapp-support-link" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-600/30 text-sm">
                     <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante por WhatsApp
                 </a>
             </div>
@@ -263,9 +263,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT JS CON TODAS LAS CUENTAS -->
+    <!-- SCRIPT COMPLETO -->
     <script>
-        // LISTADO COMPLETO DE PLATAFORMAS Y SERVICIOS
         let defaultProducts = [
             { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
             { id: 'netflix-comp', name: 'Netflix (Cuenta Completa)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
@@ -282,7 +281,6 @@
             { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, icon: 'fa-satellite-dish', color: 'from-violet-600 to-purple-950' }
         ];
 
-        // Cargar productos guardados o por defecto
         function getProducts() {
             const saved = localStorage.getItem('storeProducts');
             return saved ? JSON.parse(saved) : defaultProducts;
@@ -322,7 +320,7 @@
             });
         }
 
-        // Recargar saldo exclusivamente al cliente ingresado
+        // Recarga dirigida exclusivamente al ID del cliente escrito en el panel admin
         function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
@@ -345,26 +343,6 @@
             alert(`¡Se han acreditado $${amount.toFixed(2)} MXN al cliente con ID: ${targetClientId}!`);
             document.getElementById('add-credit-client-id').value = '';
             document.getElementById('add-credit-amount').value = '100';
-        }
-
-        function updateProductPrice() {
-            const prodId = document.getElementById('price-product-id').value;
-            const newPrice = parseFloat(document.getElementById('new-product-price').value);
-
-            if (!prodId || isNaN(newPrice) || newPrice <= 0) {
-                alert('Ingresa un precio válido.');
-                return;
-            }
-
-            let currentProducts = getProducts();
-            const prodIndex = currentProducts.findIndex(p => p.id === prodId);
-            if (prodIndex !== -1) {
-                currentProducts[prodIndex].price = newPrice;
-                localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
-                renderProducts();
-                alert('Precio actualizado correctamente.');
-                document.getElementById('new-product-price').value = '';
-            }
         }
 
         function updateBankInfo() {
@@ -396,9 +374,10 @@
                 if (el) el.innerText = clientId;
             });
 
+            // Enlace de WhatsApp configurado con el número 9241955327 y el ID del cliente
             const waLink = document.getElementById('whatsapp-support-link');
             if (waLink) {
-                waLink.href = `https://wa.me/?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20${clientId}`;
+                waLink.href = `https://wa.me/529241955327?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20${clientId}`;
             }
         }
 
@@ -495,6 +474,7 @@
             }
         }
 
+        function openTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); } // Corregido para abrir correctamente abajo
         function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
@@ -504,9 +484,28 @@
             alert(`ID copiado al portapapeles: ${clientID}`);
         }
 
+        function updateProductPrice() {
+            const prodId = document.getElementById('price-product-id').value;
+            const newPrice = parseFloat(document.getElementById('new-product-price').value);
+
+            if (!prodId || isNaN(newPrice) || newPrice <= 0) {
+                alert('Ingresa un precio válido.');
+                return;
+            }
+
+            let currentProducts = getProducts();
+            const prodIndex = currentProducts.findIndex(p => p.id === prodId);
+            if (prodIndex !== -1) {
+                currentProducts[prodIndex].price = newPrice;
+                localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
+                renderProducts();
+                alert('Precio actualizado correctamente.');
+                document.getElementById('new-product-price').value = '';
+            }
+        }
+
         function addStock() { alert('Stock guardado correctamente.'); }
 
-        // Inicialización
         window.addEventListener('DOMContentLoaded', () => {
             const user = localStorage.getItem('currentUser');
             let clientID = localStorage.getItem('currentClientID');
