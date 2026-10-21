@@ -104,20 +104,19 @@
     <!-- Contenido Principal -->
     <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
         <section id="tab-shop" class="space-y-6">
-            <div class="flex justify-between items-center flex-wrap gap-3">
-                <div>
-                    <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 🍿</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Tu ID de recarga: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
-                </div>
-                <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 hover:opacity-90 text-white text-sm px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
-                    <i class="fa-solid fa-wallet"></i> Recargar Saldo
-                </button>
+            <div class="space-y-1">
+                <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 👋</h2>
+                <p class="text-xs text-slate-400">Tu ID único de recarga es: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
             </div>
 
-            <!-- Catálogo de productos -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
+            <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-sm px-5 py-3 rounded-2xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
+                <i class="fa-solid fa-wallet"></i> Recargar Saldo
+            </button>
 
-            <!-- Panel Cliente: Cuentas Compradas -->
+            <!-- Catálogo de productos con diseño original -->
+            <div class="grid grid-cols-1 gap-6" id="products-grid"></div>
+
+            <!-- Panel Cliente: Mis Cuentas Compradas -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
@@ -130,7 +129,7 @@
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
                                 <th class="p-3">Fecha Compra</th>
-                                <th class="p-3">Vencimiento</th>
+                                <th class="p-3">Vencimiento / Soporte</th>
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-purple-950/50">
@@ -268,7 +267,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE TIENDA CON COMPRAS Y FECHAS -->
+    <!-- SCRIPT CON DISEÑO ORIGINAL DE TARJETAS Y STOCK -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com"
@@ -280,24 +279,26 @@
         const database = firebase.database();
 
         let defaultProducts = [
-            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
-            { id: 'netflix-comp', name: 'Netflix (Cuenta Completa)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
-            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
-            { id: 'disney-std', name: 'Disney+ Estándar', price: 140, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
-            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
-            { id: 'vix-6m', name: 'ViX Premium (6 Meses)', price: 500, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
-            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, icon: 'fa-video', color: 'from-purple-600 to-indigo-950' },
-            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, icon: 'fa-circle-play', color: 'from-sky-600 to-blue-900' },
-            { id: 'paramount-1m', name: 'Paramount+ (1 Mes)', price: 80, icon: 'fa-mountain', color: 'from-blue-500 to-cyan-900' },
-            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, icon: 'fa-music', color: 'from-emerald-600 to-teal-950' },
-            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, icon: 'fa-play', color: 'from-red-700 to-stone-900' },
-            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, icon: 'fa-paintbrush', color: 'from-teal-500 to-cyan-800' },
-            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, icon: 'fa-satellite-dish', color: 'from-violet-600 to-purple-950' }
+            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, duration: 'Duración: 30 días' },
+            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, duration: 'Duración: 30 días' },
+            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, duration: 'Duración: 30 días' },
+            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, duration: 'Duración: 30 días' },
+            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, duration: 'Duración: 30 días' },
+            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, duration: 'Duración: 30 días' },
+            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, duration: 'Duración: 30 días' },
+            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, duration: 'Duración: 30 días' },
+            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, duration: 'Duración: 30 días' },
+            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, duration: 'Duración: 30 días' }
         ];
 
         function getProducts() {
             const saved = localStorage.getItem('storeProducts');
             return saved ? JSON.parse(saved) : defaultProducts;
+        }
+
+        function getStock() {
+            const saved = localStorage.getItem('storeStock');
+            return saved ? JSON.parse(saved) : {}; // { productId: ["cred1", "cred2"] }
         }
 
         function generateUniqueClientID() {
@@ -310,21 +311,43 @@
             if (!grid) return;
             
             const currentProducts = getProducts();
+            const stockData = getStock();
 
-            grid.innerHTML = currentProducts.map(p => `
-                <div class="bg-slate-900/80 border border-purple-500/20 rounded-2xl p-5 space-y-4 glow-card flex flex-col justify-between">
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${p.color || 'from-purple-600 to-pink-900'} flex items-center justify-center text-white text-xl shadow-lg">
-                            <i class="fa-solid ${p.icon || 'fa-tv'}"></i>
+            grid.innerHTML = currentProducts.map(p => {
+                const prodStock = stockData[p.id] || [];
+                const hasStock = prodStock.length > 0;
+
+                return `
+                    <div class="bg-slate-900/90 border border-purple-900/40 rounded-3xl overflow-hidden shadow-2xl glow-card relative flex flex-col justify-between">
+                        <!-- Insignia Agotado / Stock -->
+                        <div class="absolute top-4 right-4 z-10">
+                            ${hasStock 
+                                ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">Disponible (${prodStock.length})</span>`
+                                : `<span class="bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1 rounded-full font-bold">Agotado</span>`
+                            }
                         </div>
-                        <h3 class="text-lg font-bold text-white">${p.name}</h3>
-                        <p class="text-2xl font-extrabold text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
+
+                        <!-- Imagen o Banner de la tarjeta -->
+                        <div class="h-36 bg-gradient-to-b from-black/60 to-slate-950 flex items-center justify-center relative border-b border-purple-900/20">
+                            <h3 class="text-2xl font-black tracking-widest text-red-600 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)]">NETFLIX</h3>
+                        </div>
+
+                        <!-- Información -->
+                        <div class="p-6 space-y-4">
+                            <div class="space-y-1">
+                                <h3 class="text-lg font-bold text-white">${p.name}</h3>
+                                <p class="text-xs text-slate-400">${p.duration || 'Duración: 30 días'}</p>
+                            </div>
+                            <p class="text-3xl font-black text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
+                            
+                            ${hasStock 
+                                ? `<button onclick="buyProduct('${p.id}', '${p.name}',${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-3 rounded-2xl text-sm transition shadow-lg shadow-purple-600/30">Comprar Cuenta</button>`
+                                : `<button disabled class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-2xl text-sm cursor-not-allowed">Sin Stock</button>`
+                            }
+                        </div>
                     </div>
-                    <button onclick="buyProduct('${p.id}', '${p.name}', ${p.price})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-purple-600/30">
-                        Comprar Cuenta
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             ['price-product-id', 'stock-product-id'].forEach(selId => {
                 const sel = document.getElementById(selId);
@@ -366,7 +389,6 @@
                 const balance = data.balance || 0;
                 document.getElementById('user-balance').innerText = `$${parseFloat(balance).toFixed(2)}`;
 
-                // Renderizar compras en la tabla
                 const purchasesList = document.getElementById('purchases-list');
                 if (data.purchases) {
                     let html = '';
@@ -374,10 +396,15 @@
                         html += `
                             <tr class="hover:bg-purple-950/20 transition">
                                 <td class="p-3 font-bold text-white">${item.productName}</td>
-                                <td class="p-3 font-mono text-pink-400 select-all">${item.credentials || 'Cuenta Entregada'}</td>
+                                <td class="p-3 font-mono text-pink-400 select-all">${item.credentials}</td>
                                 <td class="p-3 text-emerald-400 font-bold">$${item.price} MXN</td>
                                 <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
-                                <td class="p-3 text-amber-400 text-xs font-bold">${item.expireDate}</td>
+                                <td class="p-3 text-xs space-y-1">
+                                    <div class="text-amber-400 font-bold">${item.expireDate}</div>
+                                    <a href="https://wa.me/529241955327?text=Hola,%20tengo%20una%20duda%20con%20mi%20cuenta%20de%20${encodeURIComponent(item.productName)}%20comprada%20el%20${encodeURIComponent(item.purchaseDate)}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
+                                        <i class="fa-brands fa-whatsapp"></i> Soporte
+                                    </a>
+                                </td>
                             </tr>
                         `;
                     });
@@ -391,6 +418,13 @@
         function buyProduct(productId, productName, price) {
             const currentID = localStorage.getItem('currentClientID');
             const clientRef = database.ref('clients/' + currentID);
+            let stockData = getStock();
+            let prodStock = stockData[productId] || [];
+
+            if (prodStock.length === 0) {
+                alert('Lo sentimos, este producto se ha quedado sin stock.');
+                return;
+            }
 
             clientRef.once('value').then((snapshot) => {
                 const data = snapshot.val() || {};
@@ -403,7 +437,11 @@
                 }
 
                 if (confirm(`¿Deseas comprar ${productName} por $${price} MXN?`)) {
-                    // Generar fechas de compra y vencimiento (30 días)
+                    // Tomar la primera credencial del stock
+                    const assignedCredentials = prodStock.shift();
+                    stockData[productId] = prodStock;
+                    localStorage.setItem('storeStock', JSON.stringify(stockData));
+
                     const now = new Date();
                     const expire = new Date();
                     expire.setDate(now.getDate() + 30);
@@ -411,17 +449,12 @@
                     const purchaseDateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     const expireDateStr = expire.toLocaleDateString();
 
-                    // Credenciales de ejemplo o tomadas del stock si hay
-                    const credentials = "correo_" + Math.floor(Math.random() * 89999 + 10000) + "@streaming.com : pass" + Math.floor(Math.random() * 8999 + 1000);
-
                     const newBalance = currentBalance - price;
-                    
-                    // Guardar en Firebase
                     const newPurchaseRef = clientRef.child('purchases').push();
                     const purchaseData = {
                         productName: productName,
                         price: price,
-                        credentials: credentials,
+                        credentials: assignedCredentials,
                         purchaseDate: purchaseDateStr,
                         expireDate: expireDateStr
                     };
@@ -430,10 +463,30 @@
                         clientRef.child('balance').set(newBalance),
                         newPurchaseRef.set(purchaseData)
                     ]).then(() => {
-                        alert('¡Compra realizada con éxito! Tus credenciales ya aparecen en la tabla.');
+                        alert('¡Compra realizada con éxito! Tus credenciales ya aparecen en la tabla de abajo.');
+                        renderProducts();
                     });
                 }
             });
+        }
+
+        function addStock() {
+            const prodId = document.getElementById('stock-product-id').value;
+            const creds = document.getElementById('stock-credentials').value.trim();
+
+            if (!prodId || !creds) {
+                alert('Selecciona un producto y escribe las credenciales.');
+                return;
+            }
+
+            let stockData = getStock();
+            if (!stockData[prodId]) stockData[prodId] = [];
+            stockData[prodId].push(creds);
+
+            localStorage.setItem('storeStock', JSON.stringify(stockData));
+            document.getElementById('stock-credentials').value = '';
+            alert('¡Stock guardado correctamente en la tienda!');
+            renderProducts();
         }
 
         function updateBankInfo() {
@@ -547,7 +600,6 @@
             }
         }
 
-        function openTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); } // corregido
         function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
@@ -576,8 +628,6 @@
                 document.getElementById('new-product-price').value = '';
             }
         }
-
-        function addStock() { alert('Stock guardado correctamente.'); }
 
         window.addEventListener('DOMContentLoaded', () => {
             const user = localStorage.getItem('currentUser');
