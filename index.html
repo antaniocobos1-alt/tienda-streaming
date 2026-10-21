@@ -112,7 +112,7 @@
             <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
 
-            <!-- Panel de Mis Cuentas Compradas -->
+            <!-- Panel Cliente -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
@@ -148,7 +148,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Configurar Datos Bancarios -->
+                <!-- Datos Bancarios -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
                         <i class="fa-solid fa-building-columns"></i> Datos Bancarios
@@ -156,7 +156,7 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs text-slate-400">Banco</label>
-                            <input type="text" id="admin-bank-name" placeholder="BBVA / Azteca" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA / Banco Azteca" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
                         </div>
                         <div>
                             <label class="text-xs text-slate-400">CLABE</label>
@@ -170,7 +170,7 @@
                     </div>
                 </div>
 
-                <!-- Recargar Saldo a Cliente por ID -->
+                <!-- Recargar por ID -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus"></i> Recargar ID
@@ -239,7 +239,7 @@
         </div>
     </div>
 
-    <!-- Modal Recarga con Datos Bancarios y Soporte de WhatsApp -->
+    <!-- Modal Recarga -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
@@ -263,36 +263,47 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE CONTROL JS -->
+    <!-- SCRIPT JS CON TODAS LAS CUENTAS -->
     <script>
-        // Productos por defecto
-        let products = [
-            { id: 'netflix-1', name: 'Netflix Premium (1 Mes)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
-            { id: 'netflix-3', name: 'Netflix (3 Meses)', price: 450, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
+        // LISTADO COMPLETO DE PLATAFORMAS Y SERVICIOS
+        let defaultProducts = [
+            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
+            { id: 'netflix-comp', name: 'Netflix (Cuenta Completa)', price: 190, icon: 'fa-film', color: 'from-red-600 to-rose-900' },
             { id: 'disney-prem', name: 'Disney+ Premium', price: 190, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
             { id: 'disney-std', name: 'Disney+ Estándar', price: 140, icon: 'fa-wand-magic-sparkles', color: 'from-blue-600 to-indigo-900' },
-            { id: 'vix-1', name: 'ViX Premium (1 Mes)', price: 110, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
-            { id: 'vix-6', name: 'ViX Premium (6 Meses)', price: 500, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
-            { id: 'hbo-mes', name: 'Max / HBO (1 Mes)', price: 150, icon: 'fa-video', color: 'from-purple-600 to-indigo-950' },
-            { id: 'spotify-1', name: 'Spotify Individual (1 Mes)', price: 100, icon: 'fa-music', color: 'from-emerald-600 to-teal-950' }
+            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
+            { id: 'vix-6m', name: 'ViX Premium (6 Meses)', price: 500, icon: 'fa-tv', color: 'from-orange-600 to-amber-900' },
+            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, icon: 'fa-video', color: 'from-purple-600 to-indigo-950' },
+            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, icon: 'fa-circle-play', color: 'from-sky-600 to-blue-900' },
+            { id: 'paramount-1m', name: 'Paramount+ (1 Mes)', price: 80, icon: 'fa-mountain', color: 'from-blue-500 to-cyan-900' },
+            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, icon: 'fa-music', color: 'from-emerald-600 to-teal-950' },
+            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, icon: 'fa-play', color: 'from-red-700 to-stone-900' },
+            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, icon: 'fa-paintbrush', color: 'from-teal-500 to-cyan-800' },
+            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, icon: 'fa-satellite-dish', color: 'from-violet-600 to-purple-950' }
         ];
 
-        // Función para generar ID único por cliente
+        // Cargar productos guardados o por defecto
+        function getProducts() {
+            const saved = localStorage.getItem('storeProducts');
+            return saved ? JSON.parse(saved) : defaultProducts;
+        }
+
         function generateUniqueClientID() {
             const randomNum = Math.floor(100000 + Math.random() * 900000);
             return `CLI-${randomNum}`;
         }
 
-        // Renderizar Productos en la Tienda
         function renderProducts() {
             const grid = document.getElementById('products-grid');
             if (!grid) return;
             
-            grid.innerHTML = products.map(p => `
+            const currentProducts = getProducts();
+
+            grid.innerHTML = currentProducts.map(p => `
                 <div class="bg-slate-900/80 border border-purple-500/20 rounded-2xl p-5 space-y-4 glow-card flex flex-col justify-between">
                     <div class="space-y-2">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white text-xl shadow-lg">
-                            <i class="fa-solid ${p.icon}"></i>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${p.color || 'from-purple-600 to-pink-900'} flex items-center justify-center text-white text-xl shadow-lg">
+                            <i class="fa-solid ${p.icon || 'fa-tv'}"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white">${p.name}</h3>
                         <p class="text-2xl font-extrabold text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
@@ -306,12 +317,12 @@
             ['price-product-id', 'stock-product-id'].forEach(selId => {
                 const sel = document.getElementById(selId);
                 if (sel) {
-                    sel.innerHTML = products.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
+                    sel.innerHTML = currentProducts.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
                 }
             });
         }
 
-        // RECARGAR SALDO ÚNICAMENTE AL CLIENTE ESPECIFICADO EN EL ADMIN
+        // Recargar saldo exclusivamente al cliente ingresado
         function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
             const amount = parseFloat(document.getElementById('add-credit-amount').value);
@@ -321,24 +332,41 @@
                 return;
             }
 
-            // Sumar crédito a ese ID de cliente en particular
             let targetBalance = parseFloat(localStorage.getItem(`balance_${targetClientId}`) || '0');
             targetBalance += amount;
             localStorage.setItem(`balance_${targetClientId}`, targetBalance);
 
-            // Si el cliente al que le cargaste saldo eres tú mismo en esta pestaña, refrescar la vista
             const currentClientID = localStorage.getItem('currentClientID');
             if (currentClientID === targetClientId) {
                 const balanceEl = document.getElementById('user-balance');
                 if (balanceEl) balanceEl.innerText = `$${targetBalance.toFixed(2)}`;
             }
 
-            alert(`¡Se han cargado $${amount.toFixed(2)} MXN al cliente con ID: ${targetClientId}!`);
+            alert(`¡Se han acreditado $${amount.toFixed(2)} MXN al cliente con ID: ${targetClientId}!`);
             document.getElementById('add-credit-client-id').value = '';
             document.getElementById('add-credit-amount').value = '100';
         }
 
-        // GUARDAR Y CARGAR DATOS BANCARIOS DESDE EL ADMIN
+        function updateProductPrice() {
+            const prodId = document.getElementById('price-product-id').value;
+            const newPrice = parseFloat(document.getElementById('new-product-price').value);
+
+            if (!prodId || isNaN(newPrice) || newPrice <= 0) {
+                alert('Ingresa un precio válido.');
+                return;
+            }
+
+            let currentProducts = getProducts();
+            const prodIndex = currentProducts.findIndex(p => p.id === prodId);
+            if (prodIndex !== -1) {
+                currentProducts[prodIndex].price = newPrice;
+                localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
+                renderProducts();
+                alert('Precio actualizado correctamente.');
+                document.getElementById('new-product-price').value = '';
+            }
+        }
+
         function updateBankInfo() {
             const name = document.getElementById('admin-bank-name').value;
             const clabe = document.getElementById('admin-bank-clabe').value;
@@ -476,7 +504,6 @@
             alert(`ID copiado al portapapeles: ${clientID}`);
         }
 
-        function updateProductPrice() { alert('Precio actualizado correctamente.'); }
         function addStock() { alert('Stock guardado correctamente.'); }
 
         // Inicialización
