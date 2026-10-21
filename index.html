@@ -145,7 +145,7 @@
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
                                 <th class="p-3">Fecha Compra</th>
-                                <th class="p-3">Vencimiento / Soporte</th>
+                                <th class="p-3">Vencimiento / Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-purple-950/50">
@@ -770,6 +770,19 @@
             });
         }
 
+        /* --- COPIAR CREDENCIALES DESDE CLIENTE --- */
+        function copyAccountCredentials(elementId) {
+            const credsElement = document.getElementById(elementId);
+            if (credsElement) {
+                const textToCopy = credsElement.innerText;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert('¡Credenciales copiadas al portapapeles con éxito! 📋✨');
+                }).catch(err => {
+                    alert('No se pudo copiar automáticamente.');
+                });
+            }
+        }
+
         /* --- CONTADOR GLOBAL, HISTORIAL Y RECORDATORIOS --- */
         function loadGlobalSalesStats() {
             const clientsRef = database.ref('clients');
@@ -910,21 +923,26 @@
                 const purchasesList = document.getElementById('purchases-list');
                 if (data.purchases) {
                     let html = '';
-                    Object.values(data.purchases).forEach(item => {
+                    Object.entries(data.purchases).forEach(([purchaseId, item]) => {
                         const supportMsg = `Hola, soy ${currentUsername} (ID: ${clientID}). Tengo un problema con mi cuenta de ${item.productName} comprada el ${item.purchaseDate}. Las credenciales son: ${item.credentials}`;
                         const encodedMsg = encodeURIComponent(supportMsg);
 
                         html += `
                             <tr class="hover:bg-purple-950/20 transition">
                                 <td class="p-3 font-bold text-white">${item.productName}</td>
-                                <td class="p-3 font-mono text-pink-400 select-all">${item.credentials}</td>
+                                <td class="p-3 font-mono text-pink-400 select-all" id="creds-${purchaseId}">${item.credentials}</td>
                                 <td class="p-3 text-emerald-400 font-bold">$${item.price} MXN</td>
                                 <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
-                                <td class="p-3 text-xs space-y-1">
+                                <td class="p-3 text-xs space-y-2">
                                     <div class="text-amber-400 font-bold">${item.expireDate}</div>
-                                    <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
-                                        <i class="fa-brands fa-whatsapp"></i> Soporte
-                                    </a>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <button onclick="copyAccountCredentials('creds-${purchaseId}')" class="inline-flex items-center gap-1 bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
+                                            <i class="fa-solid fa-copy"></i> Copiar Cuenta
+                                        </button>
+                                        <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
+                                            <i class="fa-brands fa-whatsapp"></i> Soporte
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -993,6 +1011,7 @@
         function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('login-username').value.trim();
+            if (!username) return;
             
             let clientId = localStorage.getItem(`clientID_${username}`);
             if (!clientId) {
@@ -1003,6 +1022,16 @@
             localStorage.setItem('currentUser', username);
             localStorage.setItem('currentClientID', clientId);
 
+            // Asegurar que el nodo exista en Firebase para evitar errores de referencia vacía
+            database.ref('clients/' + clientId).once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    database.ref('clients/' + clientId).set({
+                        username: username,
+                        balance: 0
+                    });
+                }
+            });
+
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
         }
@@ -1010,11 +1039,22 @@
         function handleRegister(event) {
             event.preventDefault();
             const username = document.getElementById('reg-username').value.trim();
+            if (!username) return;
             
-            const clientId = generateUniqueClientID();
-            localStorage.setItem(`clientID_${username}`, clientId);
+            let clientId = localStorage.getItem(`clientID_${username}`);
+            if (!clientId) {
+                clientId = generateUniqueClientID();
+                localStorage.setItem(`clientID_${username}`, clientId);
+            }
+
             localStorage.setItem('currentUser', username);
             localStorage.setItem('currentClientID', clientId);
+
+            // Registrar usuario en Firebase con saldo inicial en 0
+            database.ref('clients/' + clientId).set({
+                username: username,
+                balance: 0
+            });
 
             document.getElementById('auth-screen').classList.add('hidden');
             location.reload();
@@ -1104,18 +1144,15 @@
             const user = localStorage.getItem('currentUser');
             let clientID = localStorage.getItem('currentClientID');
 
-            if (user) {
+            if (user && clientID) {
                 document.getElementById('auth-screen').classList.add('hidden');
                 const userEl = document.getElementById('welcome-username');
                 if (userEl) userEl.innerText = user;
 
-                if (!clientID) {
-                    clientID = generateUniqueClientID();
-                    localStorage.setItem(`clientID_${user}`, clientID);
-                    localStorage.setItem('currentClientID', clientID);
-                }
                 updateClientIDDisplays(clientID);
                 listenUserData(clientID);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
             }
 
             renderProducts();
