@@ -167,6 +167,60 @@
                 </button>
             </div>
 
+            <!-- Contadores de Ventas, Dinero y Botón de Reinicio 🫰 -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-900/80 border border-emerald-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+                    <div class="space-y-1">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Cuentas Vendidas</p>
+                        <h3 id="admin-total-sold-count" class="text-3xl font-black text-emerald-400">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 text-2xl">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-pink-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+                    <div class="space-y-1">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Recaudado</p>
+                        <h3 id="admin-total-money" class="text-3xl font-black text-pink-400">$0.00 MXN</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400 text-2xl">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-red-500/40 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Reiniciar Contador</p>
+                    <button type="button" onclick="resetSalesStats()" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-red-600/20">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Estadísticas
+                    </button>
+                </div>
+            </div>
+
+            <!-- HISTORIAL GENERAL DE CUENTAS DE CLIENTES Y VENCIMIENTOS -->
+            <div class="bg-slate-900/80 border border-purple-500/40 p-6 rounded-2xl space-y-4 shadow-2xl">
+                <h3 class="text-lg font-bold text-pink-400 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Historial General y Vencimientos de Cuentas
+                </h3>
+                <div class="overflow-x-auto max-h-[400px]">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950 text-slate-400 sticky top-0 z-10">
+                            <tr>
+                                <th class="p-3">Cliente / ID</th>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">Credenciales</th>
+                                <th class="p-3">Precio</th>
+                                <th class="p-3">Compra</th>
+                                <th class="p-3">Vencimiento / Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-all-purchases-list" class="divide-y divide-purple-950/50">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">No hay cuentas vendidas aún.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Datos Bancarios -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
@@ -652,6 +706,7 @@
             }
 
             const currentID = localStorage.getItem('currentClientID');
+            const currentUsername = localStorage.getItem('currentUser') || 'Cliente';
             const clientRef = database.ref('clients/' + currentID);
             const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
@@ -683,9 +738,12 @@
                             
                             const expire = new Date();
                             expire.setDate(now.getDate() + parseInt(days));
-                            const expireDateStr = expire.toLocaleDateString();
+                            // Guardamos en formato YYYY-MM-DD para comparar fácilmente vencimientos
+                            const expireDateStr = expire.toISOString().split('T')[0];
 
                             newPurchasesPromises.push(newPurchaseRef.set({
+                                clientName: currentUsername,
+                                clientId: currentID,
                                 productName: item.name,
                                 price: item.price,
                                 credentials: assignedCredentials,
@@ -703,13 +761,106 @@
                         ...newPurchasesPromises
                     ]).then(() => {
                         localStorage.setItem('storeStock', JSON.stringify(stockData));
-                        alert('¡Compra realizada con éxito! Tus cuentas ya están listas abajo con su fecha de vencimiento calculada.');
+                        alert('¡Compra realizada con éxito! Tus cuentas ya están listas abajo.');
                         clearCart();
                         closeCartModal();
                         renderProducts();
+                        loadGlobalSalesStats();
                     });
                 }
             });
+        }
+
+        /* --- CONTADOR GLOBAL, HISTORIAL Y RECORDATORIOS --- */
+        function loadGlobalSalesStats() {
+            const clientsRef = database.ref('clients');
+            clientsRef.on('value', (snapshot) => {
+                let totalSoldCount = 0;
+                let totalMoneyEarned = 0;
+                let allPurchasesHTML = '';
+
+                const clientsData = snapshot.val() || {};
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                Object.entries(clientsData).forEach(([clientId, client]) => {
+                    if (client.purchases) {
+                        Object.values(client.purchases).forEach(purchase => {
+                            totalSoldCount += 1;
+                            totalMoneyEarned += parseFloat(purchase.price || 0);
+
+                            // Lógica de recordatorio de vencimiento
+                            const expireDate = purchase.expireDate || '';
+                            let badgeStyle = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                            let statusText = `Vence: ${expireDate}`;
+
+                            if (expireDate) {
+                                const today = new Date(todayStr);
+                                const exp = new Date(expireDate);
+                                const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+
+                                if (diffDays < 0) {
+                                    badgeStyle = 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse';
+                                    statusText = `¡VENCIDA! (${expireDate})`;
+                                } else if (diffDays <= 3) {
+                                    badgeStyle = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                                    statusText = `Por vencer (${expireDate})`;
+                                }
+                            }
+
+                            const clientDisplayName = purchase.clientName || client.username || 'Cliente';
+
+                            allPurchasesHTML += `
+                                <tr class="hover:bg-purple-950/20 transition">
+                                    <td class="p-3">
+                                        <div class="font-bold text-white">${clientDisplayName}</div>
+                                        <div class="text-xs text-pink-400 font-mono">${purchase.clientId || clientId}</div>
+                                    </td>
+                                    <td class="p-3 font-bold text-white">${purchase.productName}</td>
+                                    <td class="p-3 font-mono text-cyan-400 select-all">${purchase.credentials}</td>
+                                    <td class="p-3 text-emerald-400 font-bold">$${purchase.price} MXN</td>
+                                    <td class="p-3 text-slate-300 text-xs">${purchase.purchaseDate}</td>
+                                    <td class="p-3 text-xs">
+                                        <span class="px-2.5 py-1 rounded-lg border font-bold inline-block ${badgeStyle}">
+                                            ${statusText}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                });
+
+                const countEl = document.getElementById('admin-total-sold-count');
+                const moneyEl = document.getElementById('admin-total-money');
+                const historyEl = document.getElementById('admin-all-purchases-list');
+
+                if (countEl) countEl.innerText = totalSoldCount;
+                if (moneyEl) moneyEl.innerText = `$${totalMoneyEarned.toFixed(2)} MXN`;
+                if (historyEl) {
+                    historyEl.innerHTML = allPurchasesHTML || `<tr><td colspan="6" class="p-4 text-center text-slate-500">No hay cuentas vendidas aún.</td></tr>`;
+                }
+            });
+        }
+
+        function resetSalesStats() {
+            if (confirm('¿Estás seguro de reiniciar los contadores? Esto eliminará el historial de compras de todos los clientes en Firebase y dejará las estadísticas en 0.')) {
+                const clientsRef = database.ref('clients');
+                clientsRef.once('value').then((snapshot) => {
+                    const clientsData = snapshot.val() || {};
+                    let updates = {};
+
+                    Object.keys(clientsData).forEach(clientId => {
+                        updates[`clients/${clientId}/purchases`] = null;
+                    });
+
+                    database.ref().update(updates).then(() => {
+                        alert('¡Estadísticas reiniciadas con éxito!');
+                        loadGlobalSalesStats();
+                    }).catch(error => {
+                        alert('Error al reiniciar: ' + error.message);
+                    });
+                });
+            }
         }
 
         function copyBankDetails() {
@@ -917,7 +1068,7 @@
             }
         }
 
-        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        function openTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
         function copyClientID() {
@@ -971,6 +1122,7 @@
 
             renderProducts();
             loadBankInfo();
+            loadGlobalSalesStats();
         });
     </script>
 </body>
